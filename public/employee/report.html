@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>EcoTrack - Employee Reports</title>
+  <style>
+    dialog::backdrop {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+    dialog[open] {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-100 border-r border-gray-300 flex flex-col justify-between p-5">
+      <nav>
+        <ul class="space-y-4">
+          <li class="text-lg font-bold">EcoTrack</li>
+          <li><a href="#" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer">Dashboard</a></li>
+          <li>
+            <a href="#" class="block px-2 py-1 rounded bg-blue-300 font-semibold cursor-default">
+              Reports
+            </a>
+          </li>
+          <li><a href="#" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer">Logs</a></li>
+        </ul>
+      </nav>
+      <div class="mt-10">
+        <div class="flex items-center space-x-2">
+          <img src="https://via.placeholder.com/50" alt="User Avatar" class="rounded-full" />
+          <div>
+            <p class="font-medium">Employee User</p>
+            <p class="text-sm text-gray-600">employee@example.com</p>
+          </div>
+        </div>
+        <button class="mt-4 bg-red-500 text-white px-4 py-2 rounded w-full hover:bg-red-600 cursor-pointer">Logout</button>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="flex-1 p-8 overflow-y-auto">
+      <h1 class="text-2xl font-bold mb-6">Submit a Report</h1>
+
+      <form id="reportForm" class="max-w-md space-y-6 bg-white p-6 rounded shadow">
+        <div>
+          <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+          <input type="text" id="title" name="title" required
+            class="mt-1 block w-full border border-gray-300 rounded-md p-2" />
+        </div>
+
+        <div>
+          <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+          <textarea id="description" name="description" required rows="4"
+            class="mt-1 block w-full border border-gray-300 rounded-md p-2"></textarea>
+        </div>
+
+        <button type="submit"
+          class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer">
+          Send Report
+        </button>
+      </form>
+    </main>
+  </div>
+
+  <script>
+    const reportForm = document.getElementById('reportForm');
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('You must be logged in to submit reports.');
+      window.location.href = '/login';
+    }
+
+    reportForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const title = reportForm.title.value.trim();
+      const description = reportForm.description.value.trim();
+
+      if (!title || !description) {
+        alert('Please fill in both title and description.');
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:5000/api/reports', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ title, description })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          alert(`Error: ${errorData.message || 'Failed to send report'}`);
+          return;
+        }
+
+        alert('Report sent successfully!');
+        reportForm.reset();
+
+      } catch (error) {
+        console.error('Error sending report:', error);
+        alert('An error occurred. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html>

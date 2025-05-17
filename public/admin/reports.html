@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reports</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 h-screen flex">
+
+  <!-- Fixed Sidebar -->
+  <aside class="w-64 bg-gray-100 border-r border-gray-300 flex flex-col justify-between p-5 h-screen fixed">
+    <nav>
+      <ul class="space-y-4">
+        <li class="text-lg font-bold">EcoTrack</li>
+        <li><a href="/dashboard.html" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer">Dashboard</a></li>
+        <li><a href="/reports.html" class="block px-2 py-1 rounded bg-blue-200 cursor-pointer font-semibold">Reports</a></li>
+        <li><a href="/logs.html" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer">Logs</a></li>
+      </ul>
+    </nav>
+    <div class="mt-10">
+      <div class="flex items-center space-x-2">
+        <img src="https://via.placeholder.com/50" alt="User Avatar" class="rounded-full" />
+        <div>
+          <p class="font-medium">Admin User</p>
+          <p class="text-sm text-gray-600">mohamed@gmail.com</p>
+        </div>
+      </div>
+      <button onclick="logout()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded w-full hover:bg-red-600 cursor-pointer">Logout</button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="ml-64 flex-1 overflow-y-auto p-8">
+    <h1 class="text-2xl font-bold mb-6">Reports</h1>
+    <table class="min-w-full bg-white border border-gray-300 text-left">
+      <thead>
+        <tr>
+          <th class="border-b-2 border-gray-300 px-4 py-2">Employee</th>
+          <th class="border-b-2 border-gray-300 px-4 py-2">Title</th>
+          <th class="border-b-2 border-gray-300 px-4 py-2">Description</th>
+          <th class="border-b-2 border-gray-300 px-4 py-2">Updated</th>
+        </tr>
+      </thead>
+      <tbody id="report-list">
+        <!-- Reports will be injected here -->
+      </tbody>
+    </table>
+  </main>
+
+  <!-- Scripts -->
+  <script>
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('You are not logged in. Please log in to access this page.');
+      window.location.href = '/login';
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+
+    const reportList = document.getElementById('report-list');
+
+    async function getReports() {
+      try {
+        const response = await fetch('http://localhost:5000/api/reports', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const reports = await response.json();
+        return reports;
+      } catch (err) {
+        console.error('Error fetching reports:', err);
+        return [];
+      }
+    }
+
+    function formatDate(isoString) {
+      const date = new Date(isoString);
+      return date.toLocaleString();
+    }
+
+    async function renderReports() {
+      const reports = await getReports();
+      reportList.innerHTML = '';
+
+      reports.forEach(report => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="px-4 py-2">${report.employee?.name || 'Unknown'}</td>
+          <td class="px-4 py-2 font-medium">${report.title}</td>
+          <td class="px-4 py-2">${report.description}</td>
+          <td class="px-4 py-2">${formatDate(report.updatedAt)}</td>
+        `;
+        reportList.appendChild(row);
+      });
+    }
+
+    renderReports();
+  </script>
+</body>
+</html>
