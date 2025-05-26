@@ -3,8 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="../src/output.css" rel="stylesheet" />
   <title>EcoTrack - Admin</title>
+
+  <!-- Tailwind CSS -->
+  <link href="../src/output.css" rel="stylesheet" />
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <!-- Leaflet Routing Machine CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"
+  />
+
   <style>
     dialog::backdrop {
       background-color: rgba(0, 0, 0, 0.5);
@@ -16,6 +31,12 @@
       left: 50%;
       transform: translate(-50%, -50%);
     }
+
+    #map {
+      height: 400px;
+      width: 100%;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -25,17 +46,16 @@
       <nav>
         <ul class="space-y-4">
           <li class="text-lg font-bold">EcoTrack</li>
-          <li><a href="#" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer">Dashboard</a></li>
-          <li><a href="#" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer">Reports</a></li>
-          <li><a href="#" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer">Logs</a></li>
+          <li><a href="#" class="block px-2 py-1 rounded bg-blue-300 font-semibold cursor-default">Overview</a></li>
+          <li><a href="#" class="block px-2 py-1 rounded hover:bg-blue-200 font-semibold">Reports</a></li>
         </ul>
       </nav>
       <div class="mt-10">
         <div class="flex items-center space-x-2">
           <img src="https://via.placeholder.com/50" alt="User Avatar" class="rounded-full" />
           <div>
-            <p class="font-medium">Admin User</p>
-            <p class="text-sm text-gray-600">mohamed@gmail.com</p>
+            <p class="font-medium">Employee User</p>
+            <p class="text-sm text-gray-600">employee@example.com</p>
           </div>
         </div>
         <button class="mt-4 bg-red-500 text-white px-4 py-2 rounded w-full hover:bg-red-600 cursor-pointer">Logout</button>
@@ -44,55 +64,56 @@
 
     <!-- Main -->
     <main class="flex-1 p-8 overflow-y-auto">
-      <h1 class="text-2xl font-bold mb-6">Register Users</h1>
-      <button class="bg-blue-500 text-white px-4 py-2 rounded mb-4 hover:bg-blue-600 cursor-pointer" onclick="showUserModal()">Create New User</button>
-
+      <h1 class="text-2xl font-bold mb-6">Trash Data</h1>
       <table class="min-w-full bg-white border border-gray-300 text-left">
         <thead>
           <tr>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Name</th>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Email</th>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Role</th>
+            <th class="border-b-2 border-gray-300 px-4 py-2">Trash ID</th>
+            <th class="border-b-2 border-gray-300 px-4 py-2">Level</th>
+            <th class="border-b-2 border-gray-300 px-4 py-2">Action</th>
           </tr>
         </thead>
         <tbody id="reports-list">
-          <!-- Users will be injected here -->
+          <!-- Trash rows injected here -->
         </tbody>
       </table>
     </main>
   </div>
 
   <!-- Modal -->
-  <dialog id="userModal" class="rounded-md shadow-lg w-full max-w-md p-0">
-    <form id="userForm" method="dialog" class="bg-white p-6 rounded-md">
-      <h2 class="text-xl font-semibold mb-4">Create New User</h2>
-
-      <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-      <input type="text" id="name" name="name" class="w-full mt-1 mb-4 border border-gray-300 rounded-md p-2" required />
-
-      <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-      <input type="email" id="email" name="email" class="w-full mt-1 mb-4 border border-gray-300 rounded-md p-2" required />
-
-      <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-      <input type="password" id="password" name="password" class="w-full mt-1 mb-4 border border-gray-300 rounded-md p-2" required />
-
-      <label for="role" class="block text-sm font-medium text-gray-700">Role</label>
-      <select id="role" name="role" class="w-full mt-1 mb-4 border border-gray-300 rounded-md p-2" required>
-        <option value="admin">Admin</option>
-        <option value="user">Employee</option>
-      </select>
-
-      <div class="flex justify-end space-x-2 mt-4">
-        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 cursor-pointer">Create</button>
-        <button type="button" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 cursor-pointer" onclick="userModal.close()">Cancel</button>
+  <dialog id="MAPModal">
+    <div class="p-4">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Trash Location</h2>
+        <button onclick="MAPModal.close()" class="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400">Close</button>
       </div>
-    </form>
+      <table class="min-w-full bg-white border border-gray-300 text-left mb-4">
+        <thead>
+          <tr>
+            <th class="border-b-2 border-gray-300 px-4 py-2">Trash ID</th>
+            <th class="border-b-2 border-gray-300 px-4 py-2">Level</th>
+            <th class="border-b-2 border-gray-300 px-4 py-2">Latitude</th>
+            <th class="border-b-2 border-gray-300 px-4 py-2">Longitude</th>
+          </tr>
+        </thead>
+        <tbody id="modal-trash-info">
+          <!-- One row injected here -->
+        </tbody>
+      </table>
+      <div id="map"></div>
+    </div>
   </dialog>
 
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Leaflet Routing Machine JS -->
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
   <script>
-    const userModal = document.getElementById('userModal');
-    const userForm = document.getElementById('userForm');
     const reportsList = document.getElementById('reports-list');
+    const MAPModal = document.getElementById('MAPModal');
+    const modalTrashInfo = document.getElementById('modal-trash-info');
     const token = localStorage.getItem('token');
 
     if (!token) {
@@ -100,75 +121,99 @@
       window.location.href = '/login';
     }
 
-    function showUserModal() {
-      userModal.showModal();
-    }
-
-    async function getUsers() {
+    async function fetchTrashData() {
       try {
-        const response = await fetch('http://localhost:5000/api/users', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-        const users = await response.json();
-        return users;
-      } catch (err) {
-        console.error('Error fetching users:', err);
+        const response = await fetch('http://localhost:5000/api/trash');
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Failed to fetch trash data', error);
         return [];
       }
     }
 
-    async function renderUsers() {
-      const users = await getUsers();
+    async function showTrashData() {
+      const trashData = await fetchTrashData();
       reportsList.innerHTML = '';
-      users.forEach(user => {
+
+      trashData.forEach(trash => {
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td class="px-4 py-2">${user.name}</td>
-          <td class="px-4 py-2">${user.email}</td>
-          <td class="px-4 py-2">${user.role}</td>
+          <td class="px-4 py-2">${trash.trash_id}</td>
+          <td class="px-4 py-2">${trash.level}</td>
+          <td class="px-4 py-2">
+            <button 
+              class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+              onclick='openMapModal(${JSON.stringify(trash)})'>
+              Show Map
+            </button>
+          </td>
         `;
         reportsList.appendChild(row);
       });
     }
 
-    userForm.addEventListener('submit', async function (event) {
-      event.preventDefault();
-      const formData = new FormData(userForm);
-      const data = Object.fromEntries(formData.entries());
+    function openMapModal(trash) {
+      // Inject data into modal table
+      modalTrashInfo.innerHTML = `
+        <tr>
+          <td class="px-4 py-2">${trash.trash_id}</td>
+          <td class="px-4 py-2">${trash.level}</td>
+          <td class="px-4 py-2">${trash.latitude}</td>
+          <td class="px-4 py-2">${trash.longitude}</td>
+        </tr>
+      `;
 
-      try {
-        const response = await fetch('http://localhost:5000/api/auth/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}` // remove if not required
-          },
-          body: JSON.stringify(data)
-        });
+      // Open modal
+      MAPModal.showModal();
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          alert(`Error: ${errorData.message || 'Failed to create user'}`);
-          return;
+      // Wait a bit to ensure dialog is rendered before map load
+      setTimeout(() => {
+        const mapContainer = document.getElementById('map');
+        mapContainer.innerHTML = ''; // Reset map if reopened
+
+        const map = L.map('map').setView([trash.latitude, trash.longitude], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        L.marker([trash.latitude, trash.longitude])
+          .addTo(map)
+          .bindPopup(`<b>Trash ID:</b> ${trash.trash_id}<br><b>Level:</b> ${trash.level}`)
+          .openPopup();
+
+        // Get current location and draw route
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(position => {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+
+            L.marker([userLat, userLng])
+              .addTo(map)
+              .bindPopup("<b>Your Location</b>")
+              .openPopup();
+
+            // Draw the route
+            L.Routing.control({
+              waypoints: [
+                L.latLng(userLat, userLng),
+                L.latLng(trash.latitude, trash.longitude)
+              ],
+              routeWhileDragging: false,
+              show: false,
+              addWaypoints: false
+            }).addTo(map);
+          }, () => {
+            alert("Failed to get your location.");
+          });
+        } else {
+          alert("Geolocation not supported.");
         }
+      }, 100);
+    }
 
-        alert('User created successfully!');
-        userForm.reset();
-        userModal.close();
-        await renderUsers();
-
-      } catch (error) {
-        console.error('Failed to register user:', error);
-        alert('An error occurred. Try again.');
-      }
-    });
-
-    // On page load
-    renderUsers();
+    showTrashData();
   </script>
 </body>
 </html>

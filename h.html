@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <td>0</td>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+            </tr>
+        </thead>
+        <tbody id="date">
+
+        </tbody>
+    </table>
+    <script>
+        const date = document.getElementById('date');
+        
+        
+        const data = async ()=>{
+            try {
+        const response = await fetch('http://localhost:5000/api/trash');
+              const det = await response.json();
+             return det;
+            } catch (error) {
+                
+            }
+        };
+        data();
+        const user = async ()=>{
+            try {
+        const response = await fetch('http://localhost:5000/api/users/prof');
+              const det = await response.json();
+              console.log(det);
+             return det;
+            } catch (error) {
+                
+            }
+        };
+        user();
+        
+        const show = async ()=>{
+            const d = await data();
+        console.log(d);
+        };
+        show();
+        async function showdata() {
+      const det = await data();
+      date.innerHTML = '';
+      det.forEach(trash => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="px-4 py-2">${trash.trash_id}</td>
+          <td class="px-4 py-2">${trash.level}</td>
+          <button class="bg-blue-500 text-white px-4 py-2 rounded mb-4 hover:bg-blue-600 cursor-pointer" onclick="showModal()">SHow MAP</button>
+        `;
+        date.appendChild(row);
+      });
+    }
+    showdata()
+    </script>
+</body>
+</html>

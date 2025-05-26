@@ -4,7 +4,11 @@ const User = require('../models/User');
 const router = express.Router();
 
 // List all users (admin only)
-router.get('/', protect, authorize('admin'), async (req, res) => {
+router.get('/', protect, authorize('admin || employee'), async (req, res) => {
+  const users = await User.find().select('-password');
+  res.json(users);
+});
+router.get('/prof', async (req, res) => {
   const users = await User.find().select('-password');
   res.json(users);
 });
