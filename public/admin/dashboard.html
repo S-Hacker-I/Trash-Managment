@@ -26,9 +26,9 @@
       <nav>
         <ul class="space-y-4">
           <li class="text-lg font-bold">EcoTrack</li>
-          <li><a href="#" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer bg-blue-200">Dashboard</a></li>
-          <li><a href="#" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer">Reports</a></li>
-          <li><a href="#" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer">Logs</a></li>
+          <li><a href="/admin/dashboard" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer bg-blue-200">Dashboard</a></li>
+          <li><a href="/admin/reports" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer">Reports</a></li>
+          <li><a href="/admin/logs" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer">Logs</a></li>
         </ul>
       </nav>
       <div class="mt-10">
@@ -114,6 +114,7 @@
           }
         });
         const users = await response.json();
+        console.log(users); // Add this line to log the response t
         return users;
       } catch (err) {
         console.error('Error fetching users:', err);

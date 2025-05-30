@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Login - EcoTrack</title>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+  <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+    <h1 class="text-2xl font-bold text-center mb-6">Login</h1>
+
+    <form id="loginForm" class="space-y-5">
+      <div>
+        <label for="email" class="block text-sm font-medium">Email</label>
+        <input type="email" id="email" name="email" required class="w-full mt-1 p-2 border rounded-md" />
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium">Password</label>
+        <input type="password" id="password" name="password" required class="w-full mt-1 p-2 border rounded-md" />
+      </div>
+
+      <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+        Login
+      </button>
+    </form>
+
+    <p id="errorMessage" class="text-red-500 mt-4 text-center hidden">Invalid credentials</p>
+  </div>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const errorMessage = document.getElementById('errorMessage');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = loginForm.email.value.trim();
+      const password = loginForm.password.value.trim();
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          errorMessage.textContent = data.message || 'Invalid credentials';
+          errorMessage.classList.remove('hidden');
+          return;
+        }
+
+        // Save token and role
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('role', data.user.role); // 'admin' or 'employee'
+
+        // Redirect based on role
+        if (data.user.role === 'admin') {
+          window.location.href = '/admin/dashboard';
+        } else if (data.user.role === 'employee') {
+          window.location.href = '/employee/dashboard';
+        } else {
+          alert('Unknown user role!');
+        }
+      } catch (err) {
+        console.error(err);
+        errorMessage.textContent = 'Something went wrong. Try again.';
+        errorMessage.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

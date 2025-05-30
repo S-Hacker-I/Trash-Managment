@@ -9,13 +9,44 @@ const TrashRoute = require('./routes/trash.routes');
 const logs = require('./routes/logs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
-
-
+const path = require('path');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Public Pages
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// Admin Pages
+app.get('/admin/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'dashboard.html'));
+});
+
+app.get('/admin/reports', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'reports.html'));
+});
+
+app.get('/admin/logs', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'logs.html'));
+});
+
+// Employee Pages
+app.get('/employee/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'employee', 'dashboard.html'));
+});
+
+app.get('/employee/report', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'employee', 'report.html'));
+});
 
 // Connect MongoDB
 mongoose.connect(process.env.MONGO_URI, {

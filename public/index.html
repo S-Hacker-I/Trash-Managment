@@ -2,218 +2,563 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EcoTrack - Admin</title>
-
-  <!-- Tailwind CSS -->
-  <link href="../src/output.css" rel="stylesheet" />
-
-  <!-- Leaflet CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
-
-  <!-- Leaflet Routing Machine CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"
-  />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>EcoTrack | Smart Waste Management</title>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#10B981',
+            secondary: '#047857',
+            accent: '#34D399',
+            dark: '#064E3B',
+            light: '#D1FAE5'
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    dialog::backdrop {
-      background-color: rgba(0, 0, 0, 0.5);
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      scroll-behavior: smooth;
     }
-
-    dialog[open] {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+    
+    .hero-bg {
+      background: linear-gradient(120deg, rgba(209,250,229,0.8) 0%, rgba(255,255,255,1) 70%);
     }
-
-    #map {
-      height: 400px;
+    
+    .feature-card {
+      transition: all 0.3s ease;
+      border-top: 3px solid #10B981;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(90deg, #10B981 0%, #047857 100%);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.3);
+    }
+    
+    .nav-link::after {
+      content: '';
+      display: block;
+      width: 0;
+      height: 2px;
+      background: #34D399;
+      transition: width 0.3s;
+    }
+    
+    .nav-link:hover::after {
       width: 100%;
-      margin-top: 20px;
+    }
+    
+    .earth-icon {
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .stats-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(241,245,249,0.9) 100%);
+      backdrop-filter: blur(10px);
     }
   </style>
 </head>
-<body class="bg-gray-50">
-  <div class="flex h-screen">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-gray-100 border-r border-gray-300 flex flex-col justify-between p-5">
-      <nav>
-        <ul class="space-y-4">
-          <li class="text-lg font-bold">EcoTrack</li>
-          <li><a href="#" class="block px-2 py-1 rounded bg-blue-300 font-semibold cursor-default">Overview</a></li>
-          <li><a href="#" class="block px-2 py-1 rounded hover:bg-blue-200 font-semibold">Reports</a></li>
-        </ul>
-      </nav>
-      <div class="mt-10">
-        <div class="flex items-center space-x-2">
-          <img src="https://via.placeholder.com/50" alt="User Avatar" class="rounded-full" />
-          <div>
-            <p class="font-medium">Employee User</p>
-            <p class="text-sm text-gray-600">employee@example.com</p>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Navbar -->
+  <header class="bg-white shadow-sm fixed w-full z-50 px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center">
+      <div class="bg-primary w-10 h-10 rounded-lg flex items-center justify-center mr-3">
+        <i class="fas fa-leaf text-white text-xl"></i>
+      </div>
+      <h1 class="text-2xl font-bold text-dark">Eco<span class="text-primary">Track</span></h1>
+    </div>
+    
+    <nav class="hidden md:flex space-x-8 items-center">
+      <a href="#features" class="nav-link text-gray-600 hover:text-dark font-medium">Features</a>
+      <a href="#how-it-works" class="nav-link text-gray-600 hover:text-dark font-medium">How It Works</a>
+      <a href="#testimonials" class="nav-link text-gray-600 hover:text-dark font-medium">Testimonials</a>
+      <a href="#about" class="nav-link text-gray-600 hover:text-dark font-medium">About</a>
+      <a href="login.html" class="bg-primary text-white px-5 py-2 rounded-lg font-medium hover:bg-secondary transition-colors">Login</a>
+    </nav>
+    
+    <button class="md:hidden text-gray-600">
+      <i class="fas fa-bars text-2xl"></i>
+    </button>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-bg pt-32 pb-20 px-8 flex flex-col md:flex-row items-center justify-between">
+    <div class="max-w-xl mb-16 md:mb-0">
+      <div class="inline-block bg-light text-primary px-4 py-1 rounded-full mb-4">
+        <span class="text-sm font-medium">Smart Waste Management</span>
+      </div>
+      <h2 class="text-4xl md:text-5xl font-bold mb-4 text-gray-800 leading-tight">Track, Report & Manage Waste <span class="text-primary">Smartly</span></h2>
+      <p class="text-lg text-gray-600 mb-8">EcoTrack empowers organizations to monitor waste levels, submit real-time reports, and make environmentally conscious decisions with powerful analytics.</p>
+      <div class="flex flex-col sm:flex-row gap-4">
+        <a href="login.html" class="btn-primary text-white px-8 py-4 rounded-lg font-semibold text-center">Get Started</a>
+        <a href="#features" class="border-2 border-primary text-primary px-8 py-4 rounded-lg font-semibold text-center hover:bg-primary hover:text-white transition-colors">
+          Explore Features
+        </a>
+      </div>
+      
+      <div class="mt-12 flex items-center">
+        <div class="flex -space-x-3">
+          <div class="w-10 h-10 rounded-full bg-gray-200 border-2 border-white"></div>
+          <div class="w-10 h-10 rounded-full bg-gray-200 border-2 border-white"></div>
+          <div class="w-10 h-10 rounded-full bg-gray-200 border-2 border-white"></div>
+          <div class="w-10 h-10 rounded-full bg-gray-300 border-2 border-white flex items-center justify-center">
+            <span class="text-xs font-bold text-gray-700">+24</span>
           </div>
         </div>
-        <button class="mt-4 bg-red-500 text-white px-4 py-2 rounded w-full hover:bg-red-600 cursor-pointer">Logout</button>
+        <div class="ml-4">
+          <p class="text-gray-700 font-medium">Join 500+ organizations</p>
+          <div class="flex items-center">
+            <div class="flex text-yellow-400">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star-half-alt"></i>
+            </div>
+            <span class="ml-2 text-gray-600">4.8 (128 reviews)</span>
+          </div>
+        </div>
       </div>
-    </aside>
-
-    <!-- Main -->
-    <main class="flex-1 p-8 overflow-y-auto">
-      <h1 class="text-2xl font-bold mb-6">Trash Data</h1>
-      <table class="min-w-full bg-white border border-gray-300 text-left">
-        <thead>
-          <tr>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Trash ID</th>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Level</th>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Action</th>
-          </tr>
-        </thead>
-        <tbody id="reports-list">
-          <!-- Trash rows injected here -->
-        </tbody>
-      </table>
-    </main>
-  </div>
-
-  <!-- Modal -->
-  <dialog id="MAPModal">
-    <div class="p-4">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">Trash Location</h2>
-        <button onclick="MAPModal.close()" class="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400">Close</button>
-      </div>
-      <table class="min-w-full bg-white border border-gray-300 text-left mb-4">
-        <thead>
-          <tr>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Trash ID</th>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Level</th>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Latitude</th>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Longitude</th>
-          </tr>
-        </thead>
-        <tbody id="modal-trash-info">
-          <!-- One row injected here -->
-        </tbody>
-      </table>
-      <div id="map"></div>
     </div>
-  </dialog>
+    
+    <div class="relative">
+      <div class="earth-icon">
+        <img src="https://cdn-icons-png.flaticon.com/512/2920/2920169.png" alt="Eco Icon" class="w-72 h-72">
+      </div>
+      <div class="absolute -bottom-6 -left-6 bg-white p-4 rounded-xl shadow-lg">
+        <div class="flex items-center">
+          <div class="bg-accent w-12 h-12 rounded-lg flex items-center justify-center">
+            <i class="fas fa-chart-line text-white text-xl"></i>
+          </div>
+          <div class="ml-3">
+            <p class="text-xs text-gray-500">Average Reduction</p>
+            <p class="font-bold text-dark">32% Waste</p>
+          </div>
+        </div>
+      </div>
+      <div class="absolute -top-6 -right-6 bg-white p-4 rounded-xl shadow-lg">
+        <div class="flex items-center">
+          <div class="bg-secondary w-12 h-12 rounded-lg flex items-center justify-center">
+            <i class="fas fa-users text-white text-xl"></i>
+          </div>
+          <div class="ml-3">
+            <p class="text-xs text-gray-500">Active Users</p>
+            <p class="font-bold text-dark">1.2K+ Teams</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Stats Section -->
+  <section class="py-12 bg-gradient-to-r from-primary to-secondary">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="stats-card p-6 rounded-xl shadow-md">
+          <h3 class="text-3xl font-bold text-dark text-center">500+</h3>
+          <p class="text-gray-600 text-center">Organizations</p>
+        </div>
+        <div class="stats-card p-6 rounded-xl shadow-md">
+          <h3 class="text-3xl font-bold text-dark text-center">12K+</h3>
+          <p class="text-gray-600 text-center">Reports Monthly</p>
+        </div>
+        <div class="stats-card p-6 rounded-xl shadow-md">
+          <h3 class="text-3xl font-bold text-dark text-center">32%</h3>
+          <p class="text-gray-600 text-center">Waste Reduction</p>
+        </div>
+        <div class="stats-card p-6 rounded-xl shadow-md">
+          <h3 class="text-3xl font-bold text-dark text-center">98%</h3>
+          <p class="text-gray-600 text-center">User Satisfaction</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <!-- Leaflet Routing Machine JS -->
-  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+  <!-- Features -->
+  <section id="features" class="px-8 py-20 bg-white">
+    <div class="max-w-4xl mx-auto text-center mb-16">
+      <div class="inline-block bg-light text-primary px-4 py-1 rounded-full mb-4">
+        <span class="text-sm font-medium">Our Powerful Features</span>
+      </div>
+      <h3 class="text-3xl md:text-4xl font-bold mb-6 text-gray-800">Smart Tools for <span class="text-primary">Waste Management</span></h3>
+      <p class="text-gray-600 max-w-2xl mx-auto">EcoTrack provides comprehensive solutions for organizations to manage waste efficiently and sustainably.</p>
+    </div>
+    
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <div class="feature-card bg-white p-8 rounded-xl shadow-md">
+        <div class="w-14 h-14 rounded-lg bg-green-100 text-primary flex items-center justify-center mb-6">
+          <i class="fas fa-bolt text-2xl"></i>
+        </div>
+        <h4 class="text-xl font-semibold mb-3">Real-Time Reporting</h4>
+        <p class="text-gray-600 mb-4">Employees submit waste reports instantly with photos and location data for immediate action.</p>
+        <a href="#" class="text-primary font-medium flex items-center">
+          Learn more
+          <i class="fas fa-arrow-right ml-2 text-sm"></i>
+        </a>
+      </div>
+      
+      <div class="feature-card bg-white p-8 rounded-xl shadow-md">
+        <div class="w-14 h-14 rounded-lg bg-green-100 text-primary flex items-center justify-center mb-6">
+          <i class="fas fa-chart-pie text-2xl"></i>
+        </div>
+        <h4 class="text-xl font-semibold mb-3">Analytics Dashboard</h4>
+        <p class="text-gray-600 mb-4">Admins track waste patterns, set targets, and generate sustainability reports.</p>
+        <a href="#" class="text-primary font-medium flex items-center">
+          Learn more
+          <i class="fas fa-arrow-right ml-2 text-sm"></i>
+        </a>
+      </div>
+      
+      <div class="feature-card bg-white p-8 rounded-xl shadow-md">
+        <div class="w-14 h-14 rounded-lg bg-green-100 text-primary flex items-center justify-center mb-6">
+          <i class="fas fa-map-marker-alt text-2xl"></i>
+        </div>
+        <h4 class="text-xl font-semibold mb-3">Geo-Tracking</h4>
+        <p class="text-gray-600 mb-4">Pinpoint waste hotspots on interactive maps for optimized collection routes.</p>
+        <a href="#" class="text-primary font-medium flex items-center">
+          Learn more
+          <i class="fas fa-arrow-right ml-2 text-sm"></i>
+        </a>
+      </div>
+      
+      <div class="feature-card bg-white p-8 rounded-xl shadow-md">
+        <div class="w-14 h-14 rounded-lg bg-green-100 text-primary flex items-center justify-center mb-6">
+          <i class="fas fa-bell text-2xl"></i>
+        </div>
+        <h4 class="text-xl font-semibold mb-3">Smart Alerts</h4>
+        <p class="text-gray-600 mb-4">Automated notifications for full bins, maintenance needs, and collection schedules.</p>
+        <a href="#" class="text-primary font-medium flex items-center">
+          Learn more
+          <i class="fas fa-arrow-right ml-2 text-sm"></i>
+        </a>
+      </div>
+      
+      <div class="feature-card bg-white p-8 rounded-xl shadow-md">
+        <div class="w-14 h-14 rounded-lg bg-green-100 text-primary flex items-center justify-center mb-6">
+          <i class="fas fa-lock text-2xl"></i>
+        </div>
+        <h4 class="text-xl font-semibold mb-3">Secure Access</h4>
+        <p class="text-gray-600 mb-4">Role-based permissions with enterprise-grade security for all user types.</p>
+        <a href="#" class="text-primary font-medium flex items-center">
+          Learn more
+          <i class="fas fa-arrow-right ml-2 text-sm"></i>
+        </a>
+      </div>
+      
+      <div class="feature-card bg-white p-8 rounded-xl shadow-md">
+        <div class="w-14 h-14 rounded-lg bg-green-100 text-primary flex items-center justify-center mb-6">
+          <i class="fas fa-mobile-alt text-2xl"></i>
+        </div>
+        <h4 class="text-xl font-semibold mb-3">Mobile App</h4>
+        <p class="text-gray-600 mb-4">Full functionality on iOS and Android with offline support for field teams.</p>
+        <a href="#" class="text-primary font-medium flex items-center">
+          Learn more
+          <i class="fas fa-arrow-right ml-2 text-sm"></i>
+        </a>
+      </div>
+    </div>
+  </section>
 
-  <script>
-    const reportsList = document.getElementById('reports-list');
-    const MAPModal = document.getElementById('MAPModal');
-    const modalTrashInfo = document.getElementById('modal-trash-info');
-    const token = localStorage.getItem('token');
+  <!-- How It Works -->
+  <section id="how-it-works" class="px-8 py-20 bg-gray-50">
+    <div class="max-w-4xl mx-auto text-center mb-16">
+      <div class="inline-block bg-light text-primary px-4 py-1 rounded-full mb-4">
+        <span class="text-sm font-medium">Simple Process</span>
+      </div>
+      <h3 class="text-3xl md:text-4xl font-bold mb-6 text-gray-800">How <span class="text-primary">EcoTrack</span> Works</h3>
+      <p class="text-gray-600 max-w-2xl mx-auto">Transform your waste management process in just four simple steps.</p>
+    </div>
+    
+    <div class="max-w-5xl mx-auto">
+      <div class="grid md:grid-cols-4 gap-8">
+        <div class="text-center">
+          <div class="w-20 h-20 rounded-full bg-white border-4 border-primary flex items-center justify-center mx-auto mb-6">
+            <span class="text-3xl font-bold text-primary">1</span>
+          </div>
+          <h4 class="text-xl font-semibold mb-3">Report</h4>
+          <p class="text-gray-600">Employees submit waste reports via mobile app or web</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="w-20 h-20 rounded-full bg-white border-4 border-primary flex items-center justify-center mx-auto mb-6">
+            <span class="text-3xl font-bold text-primary">2</span>
+          </div>
+          <h4 class="text-xl font-semibold mb-3">Analyze</h4>
+          <p class="text-gray-600">AI-powered analytics identify patterns and priorities</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="w-20 h-20 rounded-full bg-white border-4 border-primary flex items-center justify-center mx-auto mb-6">
+            <span class="text-3xl font-bold text-primary">3</span>
+          </div>
+          <h4 class="text-xl font-semibold mb-3">Manage</h4>
+          <p class="text-gray-600">Admins assign tasks and optimize collection routes</p>
+        </div>
+        
+        <div class="text-center">
+          <div class="w-20 h-20 rounded-full bg-white border-4 border-primary flex items-center justify-center mx-auto mb-6">
+            <span class="text-3xl font-bold text-primary">4</span>
+          </div>
+          <h4 class="text-xl font-semibold mb-3">Improve</h4>
+          <p class="text-gray-600">Track progress and reduce waste generation</p>
+        </div>
+      </div>
+      
+      <div class="mt-20 bg-white rounded-2xl shadow-xl p-6 md:p-10">
+        <div class="flex flex-col md:flex-row items-center">
+          <div class="mb-8 md:mb-0 md:mr-10">
+            <img src="https://cdn-icons-png.flaticon.com/512/1869/1869493.png" alt="Dashboard" class="w-64 mx-auto">
+          </div>
+          <div class="flex-1">
+            <h3 class="text-2xl font-bold mb-4">Intelligent Dashboard</h3>
+            <p class="text-gray-600 mb-6">Our dashboard provides real-time insights into your waste management operations. Track KPIs, monitor progress toward sustainability goals, and generate compliance reports with just a few clicks.</p>
+            <ul class="space-y-3 mb-8">
+              <li class="flex items-center">
+                <i class="fas fa-check-circle text-primary mr-3"></i>
+                <span>Real-time waste level monitoring</span>
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check-circle text-primary mr-3"></i>
+                <span>Predictive analytics for waste generation</span>
+              </li>
+              <li class="flex items-center">
+                <i class="fas fa-check-circle text-primary mr-3"></i>
+                <span>Customizable reports and data exports</span>
+              </li>
+            </ul>
+            <a href="#" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold inline-block">View Demo</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    if (!token) {
-      alert('You are not logged in. Please log in to access this page.');
-      window.location.href = '/login';
-    }
+  <!-- Testimonials -->
+  <section id="testimonials" class="px-8 py-20 bg-gradient-to-br from-primary to-secondary text-white">
+    <div class="max-w-4xl mx-auto text-center mb-16">
+      <h3 class="text-3xl md:text-4xl font-bold mb-6">Trusted by <span class="text-accent">Industry Leaders</span></h3>
+      <p class="text-green-100 max-w-2xl mx-auto">See how EcoTrack has transformed waste management for organizations worldwide.</p>
+    </div>
+    
+    <div class="max-w-5xl mx-auto">
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-white bg-opacity-10 p-8 rounded-2xl backdrop-blur-sm">
+          <div class="flex items-center mb-6">
+            <div class="w-14 h-14 rounded-full bg-gray-200 border-2 border-white"></div>
+            <div class="ml-4">
+              <h4 class="font-bold text-lg">Sarah Johnson</h4>
+              <p class="text-green-200">Sustainability Director, GreenCity</p>
+            </div>
+          </div>
+          <p class="italic mb-6">"EcoTrack reduced our waste collection costs by 35% in the first quarter. The analytics dashboard helped us identify inefficiencies we never knew existed."</p>
+          <div class="flex text-yellow-400">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+        </div>
+        
+        <div class="bg-white bg-opacity-10 p-8 rounded-2xl backdrop-blur-sm">
+          <div class="flex items-center mb-6">
+            <div class="w-14 h-14 rounded-full bg-gray-200 border-2 border-white"></div>
+            <div class="ml-4">
+              <h4 class="font-bold text-lg">Michael Rodriguez</h4>
+              <p class="text-green-200">Facilities Manager, TechCorp</p>
+            </div>
+          </div>
+          <p class="italic mb-6">"Our field teams love the mobile app. Reporting issues takes seconds now, and we've improved response times by 60%. This platform is a game-changer."</p>
+          <div class="flex text-yellow-400">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-12 flex flex-wrap justify-center gap-4">
+        <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+          <img src="https://cdn-icons-png.flaticon.com/512/732/732228.png" alt="Company" class="h-8 opacity-80">
+        </div>
+        <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+          <img src="https://cdn-icons-png.flaticon.com/512/6033/6033716.png" alt="Company" class="h-8 opacity-80">
+        </div>
+        <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+          <img src="https://cdn-icons-png.flaticon.com/512/3577/3577738.png" alt="Company" class="h-8 opacity-80">
+        </div>
+        <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+          <img src="https://cdn-icons-png.flaticon.com/512/3064/3064730.png" alt="Company" class="h-8 opacity-80">
+        </div>
+        <div class="bg-white bg-opacity-20 p-4 rounded-lg">
+          <img src="https://cdn-icons-png.flaticon.com/512/2583/2583351.png" alt="Company" class="h-8 opacity-80">
+        </div>
+      </div>
+    </div>
+  </section>
 
-    async function fetchTrashData() {
-      try {
-        const response = await fetch('http://localhost:5000/api/trash');
-        const data = await response.json();
-        return data;
-      } catch (error) {
-        console.error('Failed to fetch trash data', error);
-        return [];
-      }
-    }
+  <!-- About -->
+  <section id="about" class="px-8 py-20 bg-white">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2 mb-12 md:mb-0 md:pr-12">
+          <div class="inline-block bg-light text-primary px-4 py-1 rounded-full mb-4">
+            <span class="text-sm font-medium">About Us</span>
+          </div>
+          <h3 class="text-3xl md:text-4xl font-bold mb-6 text-gray-800">Building a <span class="text-primary">Sustainable Future</span> Together</h3>
+          <p class="text-gray-600 mb-6">
+            EcoTrack was founded by environmental engineers and data scientists who saw an opportunity to apply technology to one of our planet's most pressing challenges: waste management.
+          </p>
+          <p class="text-gray-600 mb-8">
+            Our mission is to empower organizations of all sizes to reduce their environmental footprint through intelligent waste tracking and management solutions.
+          </p>
+          
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <h4 class="text-xl font-semibold text-dark mb-3">Our Mission</h4>
+              <p class="text-gray-600">Enable smarter waste decisions through technology and data.</p>
+            </div>
+            <div>
+              <h4 class="text-xl font-semibold text-dark mb-3">Our Vision</h4>
+              <p class="text-gray-600">A world where waste is minimized and resources are valued.</p>
+            </div>
+          </div>
+          
+          <a href="#" class="btn-primary text-white px-8 py-4 rounded-lg font-semibold inline-block mt-8">Learn More About Us</a>
+        </div>
+        
+        <div class="md:w-1/2 relative">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-64"></div>
+            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48 mt-12"></div>
+            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48"></div>
+            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-full h-64 mt-12"></div>
+          </div>
+          <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <div class="w-24 h-24 rounded-full bg-primary flex items-center justify-center">
+              <i class="fas fa-play text-white text-3xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    async function showTrashData() {
-      const trashData = await fetchTrashData();
-      reportsList.innerHTML = '';
+  <!-- CTA Section -->
+  <section class="px-8 py-16 bg-gradient-to-r from-primary to-secondary">
+    <div class="max-w-4xl mx-auto text-center">
+      <h3 class="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Transform Your Waste Management?</h3>
+      <p class="text-green-100 max-w-2xl mx-auto mb-10">Join thousands of organizations using EcoTrack to reduce costs, improve efficiency, and make a positive environmental impact.</p>
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a href="login.html" class="bg-white text-primary px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors">Start Free Trial</a>
+        <a href="#" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-primary transition-colors">Schedule a Demo</a>
+      </div>
+    </div>
+  </section>
 
-      trashData.forEach(trash => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td class="px-4 py-2">${trash.trash_id}</td>
-          <td class="px-4 py-2">${trash.level}</td>
-          <td class="px-4 py-2">
-            <button 
-              class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-              onclick='openMapModal(${JSON.stringify(trash)})'>
-              Show Map
-            </button>
-          </td>
-        `;
-        reportsList.appendChild(row);
-      });
-    }
-
-    function openMapModal(trash) {
-      // Inject data into modal table
-      modalTrashInfo.innerHTML = `
-        <tr>
-          <td class="px-4 py-2">${trash.trash_id}</td>
-          <td class="px-4 py-2">${trash.level}</td>
-          <td class="px-4 py-2">${trash.latitude}</td>
-          <td class="px-4 py-2">${trash.longitude}</td>
-        </tr>
-      `;
-
-      // Open modal
-      MAPModal.showModal();
-
-      // Wait a bit to ensure dialog is rendered before map load
-      setTimeout(() => {
-        const mapContainer = document.getElementById('map');
-        mapContainer.innerHTML = ''; // Reset map if reopened
-
-        const map = L.map('map').setView([trash.latitude, trash.longitude], 15);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        L.marker([trash.latitude, trash.longitude])
-          .addTo(map)
-          .bindPopup(`<b>Trash ID:</b> ${trash.trash_id}<br><b>Level:</b> ${trash.level}`)
-          .openPopup();
-
-        // Get current location and draw route
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(position => {
-            const userLat = position.coords.latitude;
-            const userLng = position.coords.longitude;
-
-            L.marker([userLat, userLng])
-              .addTo(map)
-              .bindPopup("<b>Your Location</b>")
-              .openPopup();
-
-            // Draw the route
-            L.Routing.control({
-              waypoints: [
-                L.latLng(userLat, userLng),
-                L.latLng(trash.latitude, trash.longitude)
-              ],
-              routeWhileDragging: false,
-              show: false,
-              addWaypoints: false
-            }).addTo(map);
-          }, () => {
-            alert("Failed to get your location.");
-          });
-        } else {
-          alert("Geolocation not supported.");
-        }
-      }, 100);
-    }
-
-    showTrashData();
-  </script>
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white py-16 px-8">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+        <div>
+          <div class="flex items-center mb-6">
+            <div class="bg-primary w-10 h-10 rounded-lg flex items-center justify-center mr-3">
+              <i class="fas fa-leaf text-white text-xl"></i>
+            </div>
+            <h1 class="text-2xl font-bold">Eco<span class="text-primary">Track</span></h1>
+          </div>
+          <p class="text-gray-400 mb-6">Smart waste management solutions for a sustainable future.</p>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+              <i class="fab fa-instagram"></i>
+            </a>
+          </div>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-semibold mb-6">Product</h4>
+          <ul class="space-y-4">
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Features</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Solutions</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Demo</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-semibold mb-6">Resources</h4>
+          <ul class="space-y-4">
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Blog</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Documentation</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Guides</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors">Support</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-semibold mb-6">Contact</h4>
+          <ul class="space-y-4">
+            <li class="flex items-start">
+              <i class="fas fa-map-marker-alt text-primary mt-1 mr-3"></i>
+              <span class="text-gray-400">123 Green Street, Eco City</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-phone text-primary mt-1 mr-3"></i>
+              <span class="text-gray-400">+1 (555) 123-4567</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-envelope text-primary mt-1 mr-3"></i>
+              <span class="text-gray-400">info@ecotrack.com</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center">
+        <p class="text-gray-500">&copy; 2025 EcoTrack. All rights reserved.</p>
+        <div class="flex space-x-8 mt-4 md:mt-0">
+          <a href="#" class="text-gray-500 hover:text-white transition-colors">Privacy Policy</a>
+          <a href="#" class="text-gray-500 hover:text-white transition-colors">Terms of Service</a>
+          <a href="#" class="text-gray-500 hover:text-white transition-colors">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
