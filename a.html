@@ -3,54 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>UI DOM MANIPULATION</title>
 </head>
 <body>
-    
-    <form  method="post">
-        <label for="name">name:</label>
-        <input type="name" id="name" name="name" required>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
+    <h1>List</h1>
+    <h1 class="data">List.Dara</h1>
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <select name="role" id="role">
-            <option value="employee">employee</option>
-            <option value="admin">admin</option>
-        </select>
-
-        <button type="submit">Register</button>
-    </form>
     <script>
-        const form = document.querySelector('form');
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const role = document.getElementById('role').value;
-            fetch('https://trash-managment.onrender.com/api/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name,
-                    email,
-                    password,
-                    role
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                console.log(data);
-            })
-            .catch(err => {
-                console.log(err);
-            });
+        let datalist = [
+            {
+                id: 1,
+                name: 'John Doe',
+                email: 'johndoe@example.com'
+            },
+            {
+                id: 2,
+                name: 'Jane Doe',
+                email: 'janedoe@example.com'
+            },
+            {
+                id: 3,
+                name: 'Bob Doe',
+                email: 'bobjoe@example.com'
+            },
+            {
+                id: 4,
+                name: 'Tom Doe',
+                email: 'tomdoe@example.com'
+            },
+            {
+                id: 5,
+                name: 'Tom Doe',
+                email: 'tomdoe@example.com'
+            },
+            {
+                id: 6,
+                name: 'Tom Doe',
+                email: 'tomdoe@example.com'
+            },
+            {
+                id: 7,
+                name: 'Tom Doe',
+                email: 'tomdoe@example.com'
+            },
+            {
+                id: 8,
+                name: 'Tom Doe',
+                email: 'tomdoe@example.com'
+            },
+            {
+                id: 9,
+                name: 'Tom Doe',
+                email: 'tomdoe@example.com'
+            },
+            {
+                id: 10,
+                name: 'Tom Doe',
+                email: 'tomdoe@example.com'
+            },
+        ]
+        let data = document.querySelector('.data');
+        data.innerHTML = '';
+        datalist.forEach(item => {
+            data.innerHTML += `
+                <p>${item.id}</p>
+                <p>${item.name}</p>
+                <p>${item.email}</p>
+            `;
         });
-
     </script>
 </body>
 </html>
