@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose');
 const TrashSchema = new Schema({
-  trash_id: { type: String, required: true },
+  trash_id: { type: String, required: true, unique:true },
   level: { type: Number, required: true, unique: true },
   latitude: { type: Number, required: true },
   longitude: { type: Number, required: true }

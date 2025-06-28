@@ -3,74 +3,378 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UI DOM MANIPULATION</title>
+    <title>Data List - Modern UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#818cf8',
+                        dark: '#1e293b',
+                        light: '#f1f5f9'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .tab-active {
+            background: linear-gradient(135deg, #4f46e5, #818cf8);
+            color: white;
+        }
+    </style>
 </head>
-<body>
-    <h1>List</h1>
-    <h1 class="data">List.Dara</h1>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-2">
+                User Data Dashboard
+            </h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                Explore user information with our modern interface. Switch between different rendering methods to see performance differences.
+            </p>
+        </header>
+
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div class="flex flex-wrap gap-4 justify-between items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">User List</h2>
+                    <p class="text-gray-600">Showing <span id="userCount" class="font-bold text-primary">10</span> users</p>
+                </div>
+                
+                <div class="flex flex-wrap gap-3">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="searchInput" placeholder="Search users..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    </div>
+                    
+                    <div class="flex bg-gray-100 p-1 rounded-lg">
+                        <button id="gridViewBtn" class="p-2 rounded-lg hover:bg-gray-200">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button id="listViewBtn" class="p-2 rounded-lg hover:bg-gray-200">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rendering Method Tabs -->
+            <div class="mb-6">
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <span class="font-medium text-gray-700">Rendering Method:</span>
+                    <button id="innerHTMLBtn" class="tab-btn tab-active px-4 py-2 rounded-lg font-medium transition">innerHTML</button>
+                    <button id="joinBtn" class="tab-btn px-4 py-2 rounded-lg font-medium transition">.join('')</button>
+                    <button id="createElementBtn" class="tab-btn px-4 py-2 rounded-lg font-medium transition">createElement</button>
+                    <button id="templateBtn" class="tab-btn px-4 py-2 rounded-lg font-medium transition">Template</button>
+                </div>
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <p id="methodInfo" class="text-gray-700">
+                        <span class="font-bold">innerHTML method:</span> Simple but can cause performance issues with large datasets as it re-parses HTML each time.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- User Cards Container -->
+            <div id="listContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </div>
+        
+        <!-- Performance Comparison -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Rendering Performance</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <div class="text-3xl font-bold text-primary mb-1" id="innerHTMLTime">0ms</div>
+                    <div class="text-gray-600">innerHTML</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <div class="text-3xl font-bold text-primary mb-1" id="joinTime">0ms</div>
+                    <div class="text-gray-600">.join('')</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <div class="text-3xl font-bold text-primary mb-1" id="createElementTime">0ms</div>
+                    <div class="text-gray-600">createElement</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <div class="text-3xl font-bold text-primary mb-1" id="templateTime">0ms</div>
+                    <div class="text-gray-600">Template</div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="text-center text-gray-600 mt-8">
+            <p>Modern UI with Tailwind CSS | Data Rendering Techniques</p>
+        </footer>
+    </div>
 
     <script>
-        let datalist = [
-            {
-                id: 1,
-                name: 'John Doe',
-                email: 'johndoe@example.com'
-            },
-            {
-                id: 2,
-                name: 'Jane Doe',
-                email: 'janedoe@example.com'
-            },
-            {
-                id: 3,
-                name: 'Bob Doe',
-                email: 'bobjoe@example.com'
-            },
-            {
-                id: 4,
-                name: 'Tom Doe',
-                email: 'tomdoe@example.com'
-            },
-            {
-                id: 5,
-                name: 'Tom Doe',
-                email: 'tomdoe@example.com'
-            },
-            {
-                id: 6,
-                name: 'Tom Doe',
-                email: 'tomdoe@example.com'
-            },
-            {
-                id: 7,
-                name: 'Tom Doe',
-                email: 'tomdoe@example.com'
-            },
-            {
-                id: 8,
-                name: 'Tom Doe',
-                email: 'tomdoe@example.com'
-            },
-            {
-                id: 9,
-                name: 'Tom Doe',
-                email: 'tomdoe@example.com'
-            },
-            {
-                id: 10,
-                name: 'Tom Doe',
-                email: 'tomdoe@example.com'
-            },
-        ]
-        let data = document.querySelector('.data');
-        data.innerHTML = '';
-        datalist.forEach(item => {
-            data.innerHTML += `
-                <p>${item.id}</p>
-                <p>${item.name}</p>
-                <p>${item.email}</p>
-            `;
+        // Sample data
+        const datalist = [
+            { id: 1, name: 'John Doe', email: 'johndoe@example.com' },
+            { id: 2, name: 'Jane Smith', email: 'janesmith@example.com' },
+            { id: 3, name: 'Bob Johnson', email: 'bobjohnson@example.com' },
+            { id: 4, name: 'Sarah Williams', email: 'sarahw@example.com' },
+            { id: 5, name: 'Michael Brown', email: 'michaelb@example.com' },
+            { id: 6, name: 'Emily Davis', email: 'emilyd@example.com' },
+            { id: 7, name: 'David Wilson', email: 'davidw@example.com' },
+            { id: 8, name: 'Lisa Taylor', email: 'lisat@example.com' },
+            { id: 9, name: 'James Anderson', email: 'jamesa@example.com' },
+            { id: 10, name: 'Jennifer Thomas', email: 'jennifert@example.com' },
+        ];
+
+        // DOM elements
+        const listContainer = document.getElementById('listContainer');
+        const innerHTMLBtn = document.getElementById('innerHTMLBtn');
+        const joinBtn = document.getElementById('joinBtn');
+        const createElementBtn = document.getElementById('createElementBtn');
+        const templateBtn = document.getElementById('templateBtn');
+        const methodInfo = document.getElementById('methodInfo');
+        const searchInput = document.getElementById('searchInput');
+        const gridViewBtn = document.getElementById('gridViewBtn');
+        const listViewBtn = document.getElementById('listViewBtn');
+        
+        // Performance elements
+        const innerHTMLTime = document.getElementById('innerHTMLTime');
+        const joinTime = document.getElementById('joinTime');
+        const createElementTime = document.getElementById('createElementTime');
+        const templateTime = document.getElementById('templateTime');
+
+        // Initialize with innerHTML method
+        renderWithInnerHTML();
+        
+        // Method buttons event listeners
+        innerHTMLBtn.addEventListener('click', () => {
+            setActiveTab(innerHTMLBtn);
+            renderWithInnerHTML();
+            methodInfo.innerHTML = `<span class="font-bold">innerHTML method:</span> Simple but can cause performance issues with large datasets as it re-parses HTML each time.`;
         });
+        
+        joinBtn.addEventListener('click', () => {
+            setActiveTab(joinBtn);
+            renderWithJoin();
+            methodInfo.innerHTML = `<span class="font-bold">.join('') method:</span> More efficient than innerHTML as it builds a single string before adding to DOM, reducing reflows.`;
+        });
+        
+        createElementBtn.addEventListener('click', () => {
+            setActiveTab(createElementBtn);
+            renderWithCreateElement();
+            methodInfo.innerHTML = `<span class="font-bold">createElement method:</span> Most flexible and efficient for dynamic updates, though more verbose. Better for accessibility.`;
+        });
+        
+        templateBtn.addEventListener('click', () => {
+            setActiveTab(templateBtn);
+            renderWithTemplate();
+            methodInfo.innerHTML = `<span class="font-bold">Template method:</span> Uses HTML template element for reusable components. Clean separation of structure and logic.`;
+        });
+        
+        // View toggle buttons
+        gridViewBtn.addEventListener('click', () => {
+            listContainer.classList.remove('grid-cols-1');
+            listContainer.classList.add('grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3');
+            gridViewBtn.classList.add('bg-gray-300');
+            listViewBtn.classList.remove('bg-gray-300');
+        });
+        
+        listViewBtn.addEventListener('click', () => {
+            listContainer.classList.remove('grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3');
+            listContainer.classList.add('grid-cols-1');
+            listViewBtn.classList.add('bg-gray-300');
+            gridViewBtn.classList.remove('bg-gray-300');
+        });
+        
+        // Search functionality
+        searchInput.addEventListener('input', () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredData = datalist.filter(user => 
+                user.name.toLowerCase().includes(searchTerm) || 
+                user.email.toLowerCase().includes(searchTerm)
+            );
+            
+            // Re-render with current method
+            if (innerHTMLBtn.classList.contains('tab-active')) {
+                renderWithInnerHTML(filteredData);
+            } else if (joinBtn.classList.contains('tab-active')) {
+                renderWithJoin(filteredData);
+            } else if (createElementBtn.classList.contains('tab-active')) {
+                renderWithCreateElement(filteredData);
+            } else {
+                renderWithTemplate(filteredData);
+            }
+        });
+
+        // Set active tab
+        function setActiveTab(activeBtn) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active', 'text-white');
+                btn.classList.add('bg-gray-100', 'hover:bg-gray-200');
+            });
+            activeBtn.classList.add('tab-active', 'text-white');
+            activeBtn.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+        }
+
+        // Render with innerHTML method
+        function renderWithInnerHTML(data = datalist) {
+            const startTime = performance.now();
+            
+            listContainer.innerHTML = '';
+            data.forEach(item => {
+                listContainer.innerHTML += `
+                    <div class="card-hover bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:border-primary">
+                        <div class="p-5">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16"></div>
+                                <span class="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">ID: ${item.id}</span>
+                            </div>
+                            <h3 class="font-bold text-lg text-gray-800 mb-1">${item.name}</h3>
+                            <p class="text-gray-600 mb-4 flex items-center">
+                                <i class="fas fa-envelope mr-2 text-secondary"></i>${item.email}
+                            </p>
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded-lg transition">
+                                    <i class="fas fa-user mr-2"></i>Profile
+                                </button>
+                                <button class="flex-1 bg-primary hover:bg-secondary text-white py-2 rounded-lg transition">
+                                    <i class="fas fa-envelope mr-2"></i>Message
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            const endTime = performance.now();
+            innerHTMLTime.textContent = `${(endTime - startTime).toFixed(2)}ms`;
+            document.getElementById('userCount').textContent = data.length;
+        }
+
+        // Render with join method
+        function renderWithJoin(data = datalist) {
+            const startTime = performance.now();
+            
+            const cardsHTML = data.map(item => `
+                <div class="card-hover bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:border-primary">
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16"></div>
+                            <span class="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">ID: ${item.id}</span>
+                        </div>
+                        <h3 class="font-bold text-lg text-gray-800 mb-1">${item.name}</h3>
+                        <p class="text-gray-600 mb-4 flex items-center">
+                            <i class="fas fa-envelope mr-2 text-secondary"></i>${item.email}
+                        </p>
+                        <div class="flex space-x-2">
+                            <button class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded-lg transition">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </button>
+                            <button class="flex-1 bg-primary hover:bg-secondary text-white py-2 rounded-lg transition">
+                                <i class="fas fa-envelope mr-2"></i>Message
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            listContainer.innerHTML = cardsHTML;
+            
+            const endTime = performance.now();
+            joinTime.textContent = `${(endTime - startTime).toFixed(2)}ms`;
+            document.getElementById('userCount').textContent = data.length;
+        }
+
+        // Render with createElement method
+        function renderWithCreateElement(data = datalist) {
+            const startTime = performance.now();
+            
+            listContainer.innerHTML = '';
+            
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card-hover bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:border-primary';
+                
+                const cardContent = `
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16"></div>
+                            <span class="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">ID: ${item.id}</span>
+                        </div>
+                        <h3 class="font-bold text-lg text-gray-800 mb-1">${item.name}</h3>
+                        <p class="text-gray-600 mb-4 flex items-center">
+                            <i class="fas fa-envelope mr-2 text-secondary"></i>${item.email}
+                        </p>
+                        <div class="flex space-x-2">
+                            <button class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded-lg transition">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </button>
+                            <button class="flex-1 bg-primary hover:bg-secondary text-white py-2 rounded-lg transition">
+                                <i class="fas fa-envelope mr-2"></i>Message
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                card.innerHTML = cardContent;
+                listContainer.appendChild(card);
+            });
+            
+            const endTime = performance.now();
+            createElementTime.textContent = `${(endTime - startTime).toFixed(2)}ms`;
+            document.getElementById('userCount').textContent = data.length;
+        }
+
+        // Render with template method
+        function renderWithTemplate(data = datalist) {
+            const startTime = performance.now();
+            
+            // Create template
+            const template = document.createElement('template');
+            template.innerHTML = `
+                <div class="card-hover bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:border-primary">
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16"></div>
+                            <span class="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full" id="userId"></span>
+                        </div>
+                        <h3 class="font-bold text-lg text-gray-800 mb-1" id="userName"></h3>
+                        <p class="text-gray-600 mb-4 flex items-center" id="userEmail">
+                            <i class="fas fa-envelope mr-2 text-secondary"></i>
+                        </p>
+                        <div class="flex space-x-2">
+                            <button class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded-lg transition">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </button>
+                            <button class="flex-1 bg-primary hover:bg-secondary text-white py-2 rounded-lg transition">
+                                <i class="fas fa-envelope mr-2"></i>Message
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            listContainer.innerHTML = '';
+            
+            data.forEach(item => {
+                const clone = template.content.cloneNode(true);
+                clone.querySelector('#userId').textContent = `ID: ${item.id}`;
+                clone.querySelector('#userName').textContent = item.name;
+                clone.querySelector('#userEmail').innerHTML += item.email;
+                
+                listContainer.appendChild(clone);
+            });
+            
+            const endTime = performance.now();
+            templateTime.textContent = `${(endTime - startTime).toFixed(2)}ms`;
+            document.getElementById('userCount').textContent = data.length;
+        }
     </script>
 </body>
 </html>

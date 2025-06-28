@@ -1,69 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini Dashboard</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; display: flex; height: 100vh; }
+    aside {
+      width: 220px;
+      background: #111827;
+      color: white;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+    }
+    aside h2 { margin-bottom: 2rem; }
+    aside button {
+      background: none;
+      border: none;
+      color: white;
+      padding: 0.5rem;
+      text-align: left;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    aside button:hover {
+      background: #374151;
+      border-radius: 4px;
+    }
+    main {
+      flex: 1;
+      padding: 2rem;
+      background: #f3f4f6;
+      overflow-y: auto;
+    }
+    section { display: none; }
+    section.active { display: block; }
+    input, button, textarea {
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+      font-size: 1rem;
+      width: 100%;
+      max-width: 500px;
+    }
+    .card {
+      background: white;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+    }
+    .screenshot-img {
+      max-width: 100%;
+      margin-top: 1rem;
+      border: 1px solid #ccc;
+    }
+    code {
+      display: block;
+      background: #f0f0f0;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 <body>
-    <table>
-        <thead>
-            <tr>
-                <td>0</td>
-                <td>1</td>
-                <td>2</td>
-                <td>3</td>
-            </tr>
-        </thead>
-        <tbody id="date">
 
-        </tbody>
-    </table>
-    <script>
-        const date = document.getElementById('date');
-        
-        
-        const data = async ()=>{
-            try {
-        const response = await fetch('http://localhost:5000/api/trash');
-              const det = await response.json();
-             return det;
-            } catch (error) {
-                
-            }
-        };
-        data();
-        const user = async ()=>{
-            try {
-        const response = await fetch('http://localhost:5000/api/users/prof');
-              const det = await response.json();
-              console.log(det);
-             return det;
-            } catch (error) {
-                
-            }
-        };
-        user();
-        
-        const show = async ()=>{
-            const d = await data();
-        console.log(d);
-        };
-        show();
-        async function showdata() {
-      const det = await data();
-      date.innerHTML = '';
-      det.forEach(trash => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td class="px-4 py-2">${trash.trash_id}</td>
-          <td class="px-4 py-2">${trash.level}</td>
-          <button class="bg-blue-500 text-white px-4 py-2 rounded mb-4 hover:bg-blue-600 cursor-pointer" onclick="showModal()">SHow MAP</button>
-        `;
-        date.appendChild(row);
+  <aside>
+    <h2>Dashboard</h2>
+    <button onclick="switchPage('dashboard')">Overview</button>
+    <button onclick="switchPage('apikey')">API Key</button>
+    <button onclick="switchPage('screenshot')">Screenshot</button>
+  </aside>
+
+  <main>
+    <section id="dashboard" class="active">
+      <h2>Welcome, Mohamed</h2>
+      <div class="card">
+        <h3>User Info</h3>
+        <p><strong>ID:</strong> u123</p>
+        <p><strong>Username:</strong> mohamed</p>
+        <p><strong>Email:</strong> mohamed@example.com</p>
+        <p><strong>Subscription:</strong> Pro</p>
+        <p><strong>Active:</strong> true</p>
+        <p><strong>Joined:</strong> 2024-04-01</p>
+      </div>
+
+      <div class="card">
+        <h3>Usage</h3>
+        <p><strong>Current:</strong> 25</p>
+        <p><strong>Remaining:</strong> 75</p>
+        <p><strong>Limit:</strong> 100</p>
+        <p><strong>Can Request:</strong> true</p>
+      </div>
+
+      <div class="card">
+        <h3>Statistics</h3>
+        <p><strong>Monthly:</strong> 230</p>
+        <p><strong>Total:</strong> 1220</p>
+        <p><strong>API Keys:</strong> 3</p>
+      </div>
+
+      <div class="card">
+        <h3>Recent Screenshots</h3>
+        <ul>
+          <li>URL: google.com, Size: 300KB, Status: done</li>
+          <li>URL: twitter.com, Size: 410KB, Status: done</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="apikey">
+      <h2>Generate API Key</h2>
+      <button onclick="generateKey()">Generate Key</button>
+      <code id="apiKeyBox">Click the button above to get a key.</code>
+    </section>
+
+    <section id="screenshot">
+      <h2>Take Screenshot</h2>
+      <input type="text" id="urlInput" placeholder="Enter website URL..." />
+      <button onclick="showScreenshot()">Generate Screenshot</button>
+      <img id="screenshotImg" class="screenshot-img" src="" alt="" style="display:none;" />
+    </section>
+  </main>
+
+  <script>
+    function switchPage(id) {
+      document.querySelectorAll('section').forEach(sec => {
+        sec.classList.remove('active');
       });
+      document.getElementById(id).classList.add('active');
     }
-    showdata()
-    </script>
+
+    function generateKey() {
+      const key = 'sk-' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+      document.getElementById('apiKeyBox').textContent = key;
+    }
+
+    function showScreenshot() {
+      const url = document.getElementById('urlInput').value;
+      if (!url) return alert("Enter a URL.");
+      // Replace this with your real backend URL
+      const fakeScreenshot = `https://api.thumbnail.ws/api/abcfake/thumbnail/get?url=${encodeURIComponent(url)}&width=600`;
+      const img = document.getElementById('screenshotImg');
+      img.src = fakeScreenshot;
+      img.style.display = 'block';
+    }
+  </script>
+
 </body>
 </html>
