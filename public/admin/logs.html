@@ -1,103 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>System Logs</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 h-screen flex">
-
-  <!-- Fixed Sidebar -->
-  <aside class="w-64 bg-gray-100 border-r border-gray-300 flex flex-col justify-between p-5 h-screen fixed">
-    <nav>
-      <ul class="space-y-4">
-        <li class="text-lg font-bold">EcoTrack</li>
-        <li><a href="/admin/dashboard" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer ">Dashboard</a></li>
-        <li><a href="/admin/reports" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer">Reports</a></li>
-        <li><a href="/admin/logs" class="block px-2 py-1 rounded hover:bg-blue-200 cursor-pointer bg-blue-200">Logs</a></li>
-      </ul>
-    </nav>
-    <div class="mt-10">
-      <div class="flex items-center space-x-2">
-        <div>
-          <p class="font-medium">Admin User</p>
-          <p class="text-sm text-gray-600">mohamed@gmail.com</p>
-        </div>
-      </div>
-      <button onclick="logout()" class="mt-4 bg-red-500 text-white px-4 py-2 rounded w-full hover:bg-red-600 cursor-pointer">Logout</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>System Logs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+  </head>
+  <body class="bg-gray-100 h-full" x-data="{ sidebarOpen: false }">
+    <!-- Mobile Topbar -->
+    <div
+      class="md:hidden flex items-center justify-between p-4 bg-white shadow border-b"
+    >
+      <h1 class="text-xl font-bold">EcoTrack</h1>
+      <button
+        @click="sidebarOpen = !sidebarOpen"
+        class="text-gray-600 focus:outline-none"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            x-show="!sidebarOpen"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+          <path
+            x-show="sidebarOpen"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
     </div>
-  </aside>
 
-  <!-- Main Content -->
-  <main class="ml-64 flex-1 overflow-y-auto p-8">
-    <h1 class="text-2xl font-bold mb-6">System Logs</h1>
-    <table class="min-w-full bg-white border border-gray-300 text-left">
-      <thead>
-        <tr>
-          <th class="border-b-2 border-gray-300 px-4 py-2">User</th>
-          <th class="border-b-2 border-gray-300 px-4 py-2">Action</th>
-          <th class="border-b-2 border-gray-300 px-4 py-2">Timestamp</th>
-        </tr>
-      </thead>
-      <tbody id="logs-list">
-        <!-- Logs will be injected here -->
-      </tbody>
-    </table>
-  </main>
+    <div class="flex h-screen overflow-hidden">
+      <!-- Sidebar -->
+      <aside
+        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+        class="fixed z-40 inset-y-0 left-0 w-64 bg-gray-100 border-r border-gray-300 transform md:translate-x-0 transition-transform duration-200 ease-in-out flex flex-col justify-between p-5"
+      >
+        <nav>
+          <ul class="space-y-4">
+            <li class="text-lg font-bold">EcoTrack</li>
+            <li>
+              <a
+                href="/admin/dashboard"
+                class="block px-2 py-1 rounded hover:bg-blue-200"
+                >Dashboard</a
+              >
+            </li>
+            <li>
+              <a
+                href="/admin/reports"
+                class="block px-2 py-1 rounded hover:bg-blue-200"
+                >Reports</a
+              >
+            </li>
+            <li>
+              <a
+                href="/admin/logs"
+                class="block px-2 py-1 rounded hover:bg-blue-200 bg-blue-200"
+                >Logs</a
+              >
+            </li>
+          </ul>
+        </nav>
+        <div class="mt-10">
+          <div>
+              <p id="user-name" class="font-medium">Loading...</p>
+              <p id="user-email" class="text-sm text-gray-600">Loading...</p>
+            </div>
+          <button
+            onclick="logout()"
+            class="mt-4 bg-red-500 text-white px-4 py-2 rounded w-full hover:bg-red-600"
+          >
+            Logout
+          </button>
+        </div>
+      </aside>
 
-  <!-- Scripts -->
-  <script>
-    const token = localStorage.getItem('token');
+      <!-- Main Content -->
+      <main class="flex-1 md:ml-64 p-6 overflow-y-auto w-full">
+        <h1 class="text-2xl font-bold mb-6">System Logs</h1>
+        <div class="overflow-x-auto">
+          <table class="min-w-full bg-white border border-gray-300 text-left">
+            <thead>
+              <tr>
+                <th class="border-b-2 border-gray-300 px-4 py-2">User</th>
+                <th class="border-b-2 border-gray-300 px-4 py-2">Action</th>
+                <th class="border-b-2 border-gray-300 px-4 py-2">Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="logs-list">
+              <!-- Logs will be injected here -->
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
 
-    if (!token) {
-      alert('You are not logged in. Please log in to access this page.');
-      window.location.href = '/login';
-    }
-
-    function logout() {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
-
-    const logsList = document.getElementById('logs-list');
-
-    async function getLogs() {
-      try {
-        const response = await fetch('https://trash-managment.onrender.com/api/logs', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        const logs = await response.json();
-        return logs;
-      } catch (err) {
-        console.error('Error fetching logs:', err);
-        return [];
+    <script>
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("You are not logged in. Please log in to access this page.");
+        window.location.href = "/login";
       }
-    }
 
-    function formatTimestamp(isoString) {
-      const date = new Date(isoString);
-      return date.toLocaleString();
-    }
+      function logout() {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+      }
 
-    async function renderLogs() {
-      const logs = await getLogs();
-      logsList.innerHTML = '';
+      const logsList = document.getElementById("logs-list");
 
-      logs.forEach(log => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td class="px-4 py-2">${log.user?.name || 'Unknown'}</td>
+      async function getLogs() {
+        try {
+          const response = await fetch(
+            "https://trash-managment.onrender.com/api/logs",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+          return await response.json();
+        } catch (err) {
+          console.error("Error fetching logs:", err);
+          return [];
+        }
+      }
+
+      function formatTimestamp(isoString) {
+        const date = new Date(isoString);
+        return date.toLocaleString();
+      }
+
+      async function renderLogs() {
+        const logs = await getLogs();
+        logsList.innerHTML = "";
+        logs.forEach((log) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+          <td class="px-4 py-2">${log.user?.name || "Unknown"}</td>
           <td class="px-4 py-2">${log.action}</td>
           <td class="px-4 py-2">${formatTimestamp(log.timestamp)}</td>
         `;
-        logsList.appendChild(row);
-      });
-    }
+          logsList.appendChild(row);
+        });
+      }
+      const userNameEl = document.getElementById("user-name");
+      const userEmailEl = document.getElementById("user-email");
 
-    renderLogs();
-  </script>
-</body>
+      async function fetchUserInfo() {
+        if (!token) {
+          alert("You must be logged in.");
+          window.location.href = "/login";
+          return;
+        }
+
+        try {
+          const res = await fetch(
+            "https://trash-managment.onrender.com/api/users/prof",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!res.ok) throw new Error("Failed to fetch user info");
+
+          const data = await res.json();
+
+          // Check if data is an array and get first user if yes
+          const user = Array.isArray(data) ? data[0] : data;
+
+          userNameEl.textContent = user?.name || "Unknown User";
+          userEmailEl.textContent = user?.email || "No Email Found";
+        } catch (error) {
+          console.error(error);
+          userNameEl.textContent = "Error loading user";
+          userEmailEl.textContent = "";
+        }
+      }
+
+      fetchUserInfo();
+      renderLogs();
+    </script>
+  </body>
 </html>

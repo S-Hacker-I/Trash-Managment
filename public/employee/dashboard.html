@@ -1,240 +1,367 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EcoTrack - Admin</title>
+<html lang="en" x-data="{ sidebarOpen: false }" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EcoTrack - Admin</title>
 
-  <!-- Tailwind CSS -->
-  <link href="/src/output.css" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script src="https://unpkg.com/alpinejs" defer></script>
 
-  <!-- Leaflet CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <!-- Leaflet Routing Machine CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"
+    />
 
-  <!-- Leaflet Routing Machine CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"
-  />
-
-  <style>
-    dialog::backdrop {
-      background-color: rgba(0, 0, 0, 0.5);
-    }
-
-    dialog[open] {
-      position: fixed;
-      align-items: center;
-      top: 90%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    #map {
-      height: 400px;
-      width: 100%;
-      margin-top: 20px;
-    }
-  </style>
-</head>
-<body class="bg-gray-50 items-center">
-  <div class="flex h-screen">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-gray-100 border-r border-gray-300 flex flex-col justify-between p-5">
-      <nav>
-        <ul class="space-y-4">
-          <li class="text-lg font-bold">EcoTrack</li>
-          <li>
-            <a
-              href="/employee/dashboard"
-              class="block px-2 py-1 rounded bg-blue-300 font-semibold cursor-default"
-              >OverView</a
-            >
-          </li>
-          <li>
-            <a
-              href="/employee/report"
-              class="block px-2 py-1 rounded hover:bg-blue-200 font-semibold"
-            >
-              Reports
-            </a>
-          </li>
-        </ul>
-      </nav>
-      <div class="mt-10">
-        <div class="flex items-center space-x-2">
-          <img src="https://via.placeholder.com/50" alt="User Avatar" class="rounded-full" />
-          <div>
-            <p class="font-medium">Employee User</p>
-            <p class="text-sm text-gray-600">employee@example.com</p>
-          </div>
-        </div>
-        <button class="mt-4 bg-red-500 text-white px-4 py-2 rounded w-full hover:bg-red-600 cursor-pointer">Logout</button>
-      </div>
-    </aside>
-
-    <!-- Main -->
-    <main class="flex-1 p-8 overflow-y-auto">
-      <h1 class="text-2xl font-bold mb-6">Trash Data</h1>
-      <table class="min-w-full bg-white border border-gray-300 text-left">
-        <thead>
-          <tr>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Trash ID</th>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Level</th>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Action</th>
-          </tr>
-        </thead>
-        <tbody id="reports-list">
-          <!-- Trash rows injected here -->
-        </tbody>
-      </table>
-    </main>
-  </div>
-
-  <!-- Modal -->
-  <dialog id="MAPModal" >
-    <div class="p-4">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">Trash Location</h2>
-        <button onclick="MAPModal.close()" class="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400">Close</button>
-      </div>
-      <table class="min-w-full bg-white border border-gray-300 text-left mb-4">
-        <thead>
-          <tr>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Trash ID</th>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Level</th>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Latitude</th>
-            <th class="border-b-2 border-gray-300 px-4 py-2">Longitude</th>
-          </tr>
-        </thead>
-        <tbody id="modal-trash-info">
-          <!-- One row injected here -->
-        </tbody>
-      </table>
-      <div id="map"></div>
-    </div>
-  </dialog>
-
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Leaflet Routing Machine JS -->
-  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-
-  <script>
-    const reportsList = document.getElementById('reports-list');
-    const MAPModal = document.getElementById('MAPModal');
-    const modalTrashInfo = document.getElementById('modal-trash-info');
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-      alert('You are not logged in. Please log in to access this page.');
-      window.location.href = '/login';
-    }
-
-    async function fetchTrashData() {
-      try {
-        const response = await fetch('https://trash-managment.onrender.com/api/trashs', {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          });
-        const data = await response.json();
-        return data;
-      } catch (error) {
-        console.error('Failed to fetch trash data', error);
-        return [];
+    <style>
+      dialog::backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
       }
-    }
+      dialog[open] {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90%;
+        max-width: 600px;
+      }
+      #map {
+        height: 300px;
+        width: 100%;
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 h-full flex flex-col">
+    <!-- Mobile Header -->
+    <header
+      class="md:hidden flex items-center justify-between bg-white shadow p-4"
+    >
+      <h1 class="text-xl font-bold">EcoTrack</h1>
+      <button @click="sidebarOpen = true" class="p-2 rounded hover:bg-gray-200">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
+      </button>
+    </header>
 
-    async function showTrashData() {
-      const trashData = await fetchTrashData();
-      reportsList.innerHTML = '';
+    <div class="flex flex-1 overflow-hidden">
+      <!-- Desktop Sidebar -->
+      <aside
+        class="hidden md:flex flex-shrink-0 w-64 bg-gray-100 border-r border-gray-300 flex-col justify-between p-5"
+      >
+        <nav>
+          <ul class="space-y-4">
+            <li class="text-lg font-bold">EcoTrack</li>
+            <li>
+              <a
+                href="/employee/dashboard"
+                class="block px-2 py-1 rounded bg-blue-300 font-semibold"
+              >
+                OverView
+              </a>
+            </li>
+            <li>
+              <a
+                href="/employee/report"
+                class="block px-2 py-1 rounded hover:bg-blue-200 font-semibold"
+              >
+                Reports
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="mt-10">
+          <div class="flex items-center space-x-2 mb-4">
+            <img
+              src="https://via.placeholder.com/50"
+              alt="User Avatar"
+              class="rounded-full"
+            />
+            <div>
+              <p class="font-medium">Employee User</p>
+              <p class="text-sm text-gray-600">employee@example.com</p>
+            </div>
+          </div>
+          <button
+            onclick="logout()"
+            class="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
+          >
+            Logout
+          </button>
+        </div>
+      </aside>
 
-      trashData.forEach(trash => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
+      <!-- Mobile Sidebar -->
+      <aside
+        x-show="sidebarOpen"
+        @click.outside="sidebarOpen = false"
+        x-transition
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-100 border-r border-gray-300 flex flex-col justify-between p-5 md:hidden"
+      >
+        <button
+          @click="sidebarOpen = false"
+          class="self-end p-1 rounded hover:bg-gray-200 mb-4"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <nav class="flex-grow">
+          <ul class="space-y-4">
+            <li class="text-lg font-bold">EcoTrack</li>
+            <li>
+              <a
+                href="/employee/dashboard"
+                class="block px-2 py-1 rounded bg-blue-300 font-semibold"
+                >OverView</a
+              >
+            </li>
+            <li>
+              <a
+                href="/employee/report"
+                class="block px-2 py-1 rounded hover:bg-blue-200 font-semibold"
+                >Reports</a
+              >
+            </li>
+          </ul>
+        </nav>
+        <div class="mt-6">
+          <div class="flex items-center space-x-2 mb-4">
+            <div>
+              <p id="user-name" class="font-medium">Loading...</p>
+              <p id="user-email" class="text-sm text-gray-600">Loading...</p>
+            </div>
+          </div>
+          <button
+            onclick="logout()"
+            class="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
+          >
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1 overflow-y-auto p-4 md:p-8">
+        <h1 class="text-2xl font-bold mb-6">Trash Data</h1>
+        <div class="overflow-x-auto">
+          <table class="min-w-full bg-white border border-gray-300 text-left">
+            <thead>
+              <tr>
+                <th class="border-b-2 border-gray-300 px-4 py-2">Trash ID</th>
+                <th class="border-b-2 border-gray-300 px-4 py-2">Level</th>
+                <th class="border-b-2 border-gray-300 px-4 py-2">Action</th>
+              </tr>
+            </thead>
+            <tbody id="reports-list">
+              <!-- Trash rows injected here -->
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+
+    <!-- Map Modal -->
+    <dialog id="MAPModal" class="rounded-lg overflow-auto">
+      <div class="p-4">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold">Trash Location</h2>
+          <button
+            onclick="MAPModal.close()"
+            class="px-2 py-1 rounded hover:bg-gray-200"
+          >
+            Close
+          </button>
+        </div>
+
+        <table class="w-full mb-4 bg-white border border-gray-300 text-left">
+          <thead>
+            <tr>
+              <th class="border-b-2 border-gray-300 px-4 py-2">Trash ID</th>
+              <th class="border-b-2 border-gray-300 px-4 py-2">Level</th>
+              <th class="border-b-2 border-gray-300 px-4 py-2">Latitude</th>
+              <th class="border-b-2 border-gray-300 px-4 py-2">Longitude</th>
+            </tr>
+          </thead>
+          <tbody id="modal-trash-info"></tbody>
+        </table>
+
+        <div id="map"></div>
+      </div>
+    </dialog>
+
+    <!-- Leaflet & Routing JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+    <script>
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please log in.");
+        window.location.href = "/login";
+      }
+      function logout() {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+      }
+
+      async function fetchTrashData() {
+        try {
+          const res = await fetch(
+            "https://trash-managment.onrender.com/api/trashs",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          return await res.json();
+        } catch (e) {
+          console.error(e);
+          return [];
+        }
+      }
+
+      async function showTrashData() {
+        const list = document.getElementById("reports-list");
+        list.innerHTML = "";
+        const data = await fetchTrashData();
+        data.forEach((trash) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
           <td class="px-4 py-2">${trash.trash_id}</td>
           <td class="px-4 py-2">${trash.level}</td>
           <td class="px-4 py-2">
-            <button 
-              class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-              onclick='openMapModal(${JSON.stringify(trash)})'>
+            <button class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                    onclick='openMapModal(${JSON.stringify(trash)})'>
               Show Map
             </button>
-          </td>
-        `;
-        reportsList.appendChild(row);
-      });
-    }
+          </td>`;
+          list.appendChild(tr);
+        });
+      }
 
-    function openMapModal(trash) {
-      // Inject data into modal table
-      modalTrashInfo.innerHTML = `
+      function openMapModal(trash) {
+        document.getElementById("modal-trash-info").innerHTML = `
         <tr>
           <td class="px-4 py-2">${trash.trash_id}</td>
           <td class="px-4 py-2">${trash.level}</td>
           <td class="px-4 py-2">${trash.latitude}</td>
           <td class="px-4 py-2">${trash.longitude}</td>
-        </tr>
-      `;
+        </tr>`;
+        MAPModal.showModal();
 
-      // Open modal
-      MAPModal.showModal();
+        setTimeout(() => {
+          const mapEl = document.getElementById("map");
+          mapEl.innerHTML = "";
+          const map = L.map(mapEl).setView(
+            [trash.latitude, trash.longitude],
+            15
+          );
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "© OpenStreetMap contributors",
+          }).addTo(map);
+          L.marker([trash.latitude, trash.longitude])
+            .addTo(map)
+            .bindPopup(`Trash ID: ${trash.trash_id}<br>Level: ${trash.level}`)
+            .openPopup();
 
-      // Wait a bit to ensure dialog is rendered before map load
-      setTimeout(() => {
-        const mapContainer = document.getElementById('map');
-        mapContainer.innerHTML = ''; // Reset map if reopened
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                const uLat = pos.coords.latitude,
+                  uLng = pos.coords.longitude;
+                L.marker([uLat, uLng])
+                  .addTo(map)
+                  .bindPopup("Your Location")
+                  .openPopup();
+                L.Routing.control({
+                  waypoints: [
+                    L.latLng(uLat, uLng),
+                    L.latLng(trash.latitude, trash.longitude),
+                  ],
+                  addWaypoints: false,
+                  routeWhileDragging: false,
+                }).addTo(map);
+              },
+              () => alert("Failed to get location")
+            );
+          } else {
+            alert("Geolocation not supported.");
+          }
+        }, 100);
+      }
+      const userNameEl = document.getElementById("user-name");
+      const userEmailEl = document.getElementById("user-email");
 
-        const map = L.map('map').setView([trash.latitude, trash.longitude], 15);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        L.marker([trash.latitude, trash.longitude])
-          .addTo(map)
-          .bindPopup(`<b>Trash ID:</b> ${trash.trash_id}<br><b>Level:</b> ${trash.level}`)
-          .openPopup();
-
-        // Get current location and draw route
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(position => {
-            const userLat = position.coords.latitude;
-            const userLng = position.coords.longitude;
-
-            L.marker([userLat, userLng])
-              .addTo(map)
-              .bindPopup("<b>Your Location</b>")
-              .openPopup();
-
-            // Draw the route
-            L.Routing.control({
-              waypoints: [
-                L.latLng(userLat, userLng),
-                L.latLng(trash.latitude, trash.longitude)
-              ],
-              routeWhileDragging: false,
-              show: false,
-              addWaypoints: false
-            }).addTo(map);
-          }, () => {
-            alert("Failed to get your location.");
-          });
-        } else {
-          alert("Geolocation not supported.");
+      async function fetchUserInfo() {
+        if (!token) {
+          alert("You must be logged in.");
+          window.location.href = "/login";
+          return;
         }
-      }, 100);
-    }
 
-    showTrashData();
-  </script>
-</body>
+        try {
+          const res = await fetch(
+            "https://trash-managment.onrender.com/api/users/prof",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          if (!res.ok) throw new Error("Failed to fetch user info");
+
+          const data = await res.json();
+
+          // Check if data is an array and get first user if yes
+          const user = Array.isArray(data) ? data[0] : data;
+
+          userNameEl.textContent = user?.name || "Unknown User";
+          userEmailEl.textContent = user?.email || "No Email Found";
+        } catch (error) {
+          console.error(error);
+          userNameEl.textContent = "Error loading user";
+          userEmailEl.textContent = "";
+        }
+      }
+
+      fetchUserInfo();
+      showTrashData();
+    </script>
+  </body>
 </html>

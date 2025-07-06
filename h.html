@@ -1,152 +1,281 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mini Dashboard</title>
-  <style>
-    body { margin: 0; font-family: sans-serif; display: flex; height: 100vh; }
-    aside {
-      width: 220px;
-      background: #111827;
-      color: white;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-    }
-    aside h2 { margin-bottom: 2rem; }
-    aside button {
-      background: none;
-      border: none;
-      color: white;
-      padding: 0.5rem;
-      text-align: left;
-      cursor: pointer;
-      font-size: 1rem;
-    }
-    aside button:hover {
-      background: #374151;
-      border-radius: 4px;
-    }
-    main {
-      flex: 1;
-      padding: 2rem;
-      background: #f3f4f6;
-      overflow-y: auto;
-    }
-    section { display: none; }
-    section.active { display: block; }
-    input, button, textarea {
-      padding: 0.5rem;
-      margin: 0.5rem 0;
-      font-size: 1rem;
-      width: 100%;
-      max-width: 500px;
-    }
-    .card {
-      background: white;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      border-radius: 6px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.05);
-    }
-    .screenshot-img {
-      max-width: 100%;
-      margin-top: 1rem;
-      border: 1px solid #ccc;
-    }
-    code {
-      display: block;
-      background: #f0f0f0;
-      padding: 0.5rem;
-      border-radius: 4px;
-      font-size: 0.9rem;
-    }
-  </style>
-</head>
-<body>
+<html lang="en" x-data="{ sidebarOpen: false }">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <title>EcoTrack - Employee Reports</title>
+    <style>
+      dialog::backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+      dialog[open] {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 h-screen flex flex-col">
+    <!-- Mobile Header -->
+    <header
+      class="md:hidden flex items-center justify-between bg-white shadow p-4"
+    >
+      <h1 class="text-xl font-bold">EcoTrack</h1>
+      <button @click="sidebarOpen = true" class="p-2 rounded hover:bg-gray-200">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
+      </button>
+    </header>
 
-  <aside>
-    <h2>Dashboard</h2>
-    <button onclick="switchPage('dashboard')">Overview</button>
-    <button onclick="switchPage('apikey')">API Key</button>
-    <button onclick="switchPage('screenshot')">Screenshot</button>
-  </aside>
+    <div class="flex flex-1 overflow-hidden">
+      <!-- Desktop Sidebar -->
+      <aside
+        class="hidden md:flex flex-shrink-0 w-64 bg-gray-100 border-r p-5 flex-col justify-between"
+      >
+        <nav>
+          <ul class="space-y-4">
+            <li class="text-lg font-bold">EcoTrack</li>
+            <li>
+              <a
+                href="/employee/dashboard"
+                class="block px-2 py-1 rounded hover:bg-blue-200 font-semibold"
+              >
+                OverView
+              </a>
+            </li>
+            <li>
+              <a
+                href="/employee/report"
+                class="block px-2 py-1 rounded bg-blue-300 font-semibold"
+              >
+                Reports
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="mt-10">
+          <div class="flex items-center space-x-2 mb-4">
+            <img
+              src="https://via.placeholder.com/50"
+              alt="User Avatar"
+              class="rounded-full"
+            />
+            <div>
+              <p class="font-medium">Employee User</p>
+              <p class="text-sm text-gray-600">employee@example.com</p>
+            </div>
+          </div>
+          <button
+            onclick="logout()"
+            class="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
+          >
+            Logout
+          </button>
+        </div>
+      </aside>
 
-  <main>
-    <section id="dashboard" class="active">
-      <h2>Welcome, Mohamed</h2>
-      <div class="card">
-        <h3>User Info</h3>
-        <p><strong>ID:</strong> u123</p>
-        <p><strong>Username:</strong> mohamed</p>
-        <p><strong>Email:</strong> mohamed@example.com</p>
-        <p><strong>Subscription:</strong> Pro</p>
-        <p><strong>Active:</strong> true</p>
-        <p><strong>Joined:</strong> 2024-04-01</p>
-      </div>
+      <!-- Mobile Sidebar -->
+      <aside
+        x-show="sidebarOpen"
+        @click.outside="sidebarOpen = false"
+        x-transition
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-100 border-r p-5 flex flex-col justify-between md:hidden"
+      >
+        <button
+          @click="sidebarOpen = false"
+          class="self-end p-1 rounded hover:bg-gray-200 mb-4"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+        <nav class="flex-grow">
+          <ul class="space-y-4">
+            <li class="text-lg font-bold">EcoTrack</li>
+            <li>
+              <a
+                href="/employee/dashboard"
+                class="block px-2 py-1 rounded hover:bg-blue-200 font-semibold"
+                >OverView</a
+              >
+            </li>
+            <li>
+              <a
+                href="/employee/report"
+                class="block px-2 py-1 rounded bg-blue-300 font-semibold"
+                >Reports</a
+              >
+            </li>
+          </ul>
+        </nav>
+        <div class="mt-6">
+          <div class="flex items-center space-x-2 mb-4">
+            
+            <div>
+              <p id="user-name" class="font-medium">Loading...</p>
+              <p id="user-email" class="text-sm text-gray-600">Loading...</p>
+            </div>
+          </div>
+          <button
+            onclick="logout()"
+            class="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
+          >
+            Logout
+          </button>
+        </div>
+      </aside>
 
-      <div class="card">
-        <h3>Usage</h3>
-        <p><strong>Current:</strong> 25</p>
-        <p><strong>Remaining:</strong> 75</p>
-        <p><strong>Limit:</strong> 100</p>
-        <p><strong>Can Request:</strong> true</p>
-      </div>
+      <!-- Main Content -->
+      <main class="flex-1 overflow-y-auto p-4 md:p-8">
+        <h1 class="text-2xl font-bold mb-6">Submit a Report</h1>
 
-      <div class="card">
-        <h3>Statistics</h3>
-        <p><strong>Monthly:</strong> 230</p>
-        <p><strong>Total:</strong> 1220</p>
-        <p><strong>API Keys:</strong> 3</p>
-      </div>
+        <form
+          id="reportForm"
+          class="max-w-md space-y-6 bg-white p-6 rounded shadow mx-auto md:mx-0"
+        >
+          <div>
+            <label for="title" class="block text-sm font-medium text-gray-700"
+              >Title</label
+            >
+            <input
+              type="text"
+              id="title"
+              name="title"
+              required
+              class="mt-1 block w-full border border-gray-300 rounded-md p-2"
+            />
+          </div>
 
-      <div class="card">
-        <h3>Recent Screenshots</h3>
-        <ul>
-          <li>URL: google.com, Size: 300KB, Status: done</li>
-          <li>URL: twitter.com, Size: 410KB, Status: done</li>
-        </ul>
-      </div>
-    </section>
+          <div>
+            <label
+              for="description"
+              class="block text-sm font-medium text-gray-700"
+              >Description</label
+            >
+            <textarea
+              id="description"
+              name="description"
+              required
+              rows="4"
+              class="mt-1 block w-full border border-gray-300 rounded-md p-2"
+            ></textarea>
+          </div>
 
-    <section id="apikey">
-      <h2>Generate API Key</h2>
-      <button onclick="generateKey()">Generate Key</button>
-      <code id="apiKeyBox">Click the button above to get a key.</code>
-    </section>
+          <button
+            type="submit"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
+          >
+            Send Report
+          </button>
+        </form>
+      </main>
+    </div>
 
-    <section id="screenshot">
-      <h2>Take Screenshot</h2>
-      <input type="text" id="urlInput" placeholder="Enter website URL..." />
-      <button onclick="showScreenshot()">Generate Screenshot</button>
-      <img id="screenshotImg" class="screenshot-img" src="" alt="" style="display:none;" />
-    </section>
-  </main>
+    <script>
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("You must be logged in to submit reports.");
+        window.location.href = "/login";
+      }
+      function logout() {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+      }
+      document
+        .getElementById("reportForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const title = e.target.title.value.trim();
+          const description = e.target.description.value.trim();
+          if (!title || !description)
+            return alert("Please fill in both fields.");
+          try {
+            const res = await fetch(
+              "https://trash-managment.onrender.com/api/reports",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ title, description }),
+              }
+            );
+            if (!res.ok) {
+              const err = await res.json();
 
-  <script>
-    function switchPage(id) {
-      document.querySelectorAll('section').forEach(sec => {
-        sec.classList.remove('active');
-      });
-      document.getElementById(id).classList.add('active');
-    }
+              return alert(`Error: ${err.message || "Failed to send report"}`);
+            }
+            alert("Report sent successfully!");
+            e.target.reset();
+          } catch {
+            alert("An error occurred. Please try again.");
+          }
+        });
+      const userNameEl = document.getElementById("user-name");
+      const userEmailEl = document.getElementById("user-email");
 
-    function generateKey() {
-      const key = 'sk-' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
-      document.getElementById('apiKeyBox').textContent = key;
-    }
+      async function fetchUserInfo() {
+        if (!token) {
+          alert("You must be logged in.");
+          window.location.href = "/login";
+          return;
+        }
 
-    function showScreenshot() {
-      const url = document.getElementById('urlInput').value;
-      if (!url) return alert("Enter a URL.");
-      // Replace this with your real backend URL
-      const fakeScreenshot = `https://api.thumbnail.ws/api/abcfake/thumbnail/get?url=${encodeURIComponent(url)}&width=600`;
-      const img = document.getElementById('screenshotImg');
-      img.src = fakeScreenshot;
-      img.style.display = 'block';
-    }
-  </script>
+        try {
+          const res = await fetch(
+            "https://trash-managment.onrender.com/api/users/prof",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
 
-</body>
+          if (!res.ok) throw new Error("Failed to fetch user info");
+
+          const data = await res.json();
+
+          // Check if data is an array and get first user if yes
+          const user = Array.isArray(data) ? data[0] : data;
+
+          userNameEl.textContent = user?.name || "Unknown User";
+          userEmailEl.textContent = user?.email || "No Email Found";
+        } catch (error) {
+          console.error(error);
+          userNameEl.textContent = "Error loading user";
+          userEmailEl.textContent = "";
+        }
+      }
+
+      fetchUserInfo();
+    </script>
+  </body>
 </html>
