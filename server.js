@@ -52,8 +52,9 @@ app.get('/employee/report', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'employee', 'report.html'));
 });
 
+
 //resident
-app.get('/admin/trash', (req, res) => {
+app.get('/Resident/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'Resident', 'dashboard.html'));
 });
 
