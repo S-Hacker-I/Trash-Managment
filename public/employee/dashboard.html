@@ -3,24 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EcoTrack - Admin</title>
-
-    <!-- Tailwind CSS -->
+    <title>EcoTrack - Employee</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Alpine.js -->
     <script src="https://unpkg.com/alpinejs" defer></script>
-
-    <!-- Leaflet CSS -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
-    <!-- Leaflet Routing Machine CSS -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"
     />
-
     <style>
       dialog::backdrop {
         background-color: rgba(0, 0, 0, 0.5);
@@ -42,126 +35,68 @@
   </head>
   <body class="bg-gray-50 h-full flex flex-col">
     <!-- Mobile Header -->
-    <header
-      class="md:hidden flex items-center justify-between bg-white shadow p-4"
-    >
+    <header class="md:hidden flex items-center justify-between bg-white shadow p-4">
       <h1 class="text-xl font-bold">EcoTrack</h1>
       <button @click="sidebarOpen = true" class="p-2 rounded hover:bg-gray-200">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M4 6h16M4 12h16M4 18h16"
-          />
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+             viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
       </button>
     </header>
 
     <div class="flex flex-1 overflow-hidden">
-      <!-- Desktop Sidebar -->
-      <aside
-        class="hidden md:flex flex-shrink-0 w-64 bg-gray-100 border-r border-gray-300 flex-col justify-between p-5"
-      >
+      <!-- Sidebar -->
+      <aside class="hidden md:flex flex-shrink-0 w-64 bg-gray-100 border-r border-gray-300 flex-col justify-between p-5">
         <nav>
           <ul class="space-y-4">
             <li class="text-lg font-bold">EcoTrack</li>
-            <li>
-              <a
-                href="/employee/dashboard"
-                class="block px-2 py-1 rounded bg-blue-300 font-semibold"
-              >
-                OverView
-              </a>
+            <li><a href="/employee/dashboard"
+                   class="block px-2 py-1 rounded bg-blue-300 font-semibold">Overview</a>
             </li>
-            <li>
-              <a
-                href="/employee/report"
-                class="block px-2 py-1 rounded hover:bg-blue-200 font-semibold"
-              >
-                Reports
-              </a>
+            <li><a href="/employee/report"
+                   class="block px-2 py-1 rounded hover:bg-blue-200 font-semibold">Reports</a>
             </li>
           </ul>
         </nav>
         <div class="mt-10">
-          <div class="flex items-center space-x-2 mb-4">
-            <div>
-              <p id="user-name" class="font-medium">Loading...</p>
-              <p id="user-email" class="text-sm text-gray-600">Loading...</p>
-            </div>
-          </div>
-          <button
-            onclick="logout()"
-            class="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
-          >
+          <p id="user-name" class="font-medium">Loading...</p>
+          <p id="user-email" class="text-sm text-gray-600">Loading...</p>
+          <button onclick="logout()"
+                  class="w-full mt-4 bg-red-500 text-white py-2 rounded hover:bg-red-600">
             Logout
           </button>
         </div>
       </aside>
 
       <!-- Mobile Sidebar -->
-      <aside
-        x-show="sidebarOpen"
-        @click.outside="sidebarOpen = false"
-        x-transition
-        class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-100 border-r border-gray-300 flex flex-col justify-between p-5 md:hidden"
-      >
-        <button
-          @click="sidebarOpen = false"
-          class="self-end p-1 rounded hover:bg-gray-200 mb-4"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
+      <aside x-show="sidebarOpen" @click.outside="sidebarOpen = false" x-transition
+             class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-100 border-r border-gray-300 flex flex-col justify-between p-5 md:hidden">
+        <button @click="sidebarOpen = false"
+                class="self-end p-1 rounded hover:bg-gray-200 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
-        <nav class="flex-grow">
+        <nav>
           <ul class="space-y-4">
             <li class="text-lg font-bold">EcoTrack</li>
-            <li>
-              <a
-                href="/employee/dashboard"
-                class="block px-2 py-1 rounded bg-blue-300 font-semibold"
-                >OverView</a
-              >
+            <li><a href="/employee/dashboard"
+                   class="block px-2 py-1 rounded bg-blue-300 font-semibold">Overview</a>
             </li>
-            <li>
-              <a
-                href="/employee/report"
-                class="block px-2 py-1 rounded hover:bg-blue-200 font-semibold"
-                >Reports</a
-              >
+            <li><a href="/employee/report"
+                   class="block px-2 py-1 rounded hover:bg-blue-200 font-semibold">Reports</a>
             </li>
           </ul>
         </nav>
         <div class="mt-6">
-          <div class="flex items-center space-x-2 mb-4">
-            <div>
-              <p id="user-name" class="font-medium">Loading...</p>
-              <p id="user-email" class="text-sm text-gray-600">Loading...</p>
-            </div>
-          </div>
-          <button
-            onclick="logout()"
-            class="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
-          >
+          <p id="user-name" class="font-medium">Loading...</p>
+          <p id="user-email" class="text-sm text-gray-600">Loading...</p>
+          <button onclick="logout()"
+                  class="w-full mt-4 bg-red-500 text-white py-2 rounded hover:bg-red-600">
             Logout
           </button>
         </div>
@@ -180,7 +115,7 @@
               </tr>
             </thead>
             <tbody id="reports-list">
-              <!-- Trash rows injected here -->
+              <!-- Rows injected by JS -->
             </tbody>
           </table>
         </div>
@@ -192,14 +127,9 @@
       <div class="p-4">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-bold">Trash Location</h2>
-          <button
-            onclick="MAPModal.close()"
-            class="px-2 py-1 rounded hover:bg-gray-200"
-          >
-            Close
-          </button>
+          <button onclick="MAPModal.close()"
+                  class="px-2 py-1 rounded hover:bg-gray-200">Close</button>
         </div>
-
         <table class="w-full mb-4 bg-white border border-gray-300 text-left">
           <thead>
             <tr>
@@ -211,21 +141,19 @@
           </thead>
           <tbody id="modal-trash-info"></tbody>
         </table>
-
         <div id="map"></div>
       </div>
     </dialog>
 
-    <!-- Leaflet & Routing JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-
     <script>
       const token = localStorage.getItem("token");
       if (!token) {
         alert("Please log in.");
         window.location.href = "/login";
       }
+
       function logout() {
         localStorage.removeItem("token");
         window.location.href = "/login";
@@ -256,28 +184,53 @@
         data.forEach((trash) => {
           const tr = document.createElement("tr");
           tr.innerHTML = `
-          <td class="px-4 py-2">${trash.trash_id}</td>
-          <td class="px-4 py-2">${trash.level}</td>
-          <td class="px-4 py-2">
-            <button class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                    onclick='openMapModal(${JSON.stringify(trash)})'>
-              Show Map
-            </button>
-          </td>`;
+            <td class="px-4 py-2">${trash.trash_id}</td>
+            <td class="px-4 py-2" id="level-${trash._id}">${trash.level}</td>
+            <td class="px-4 py-2 space-x-2">
+              <button
+                class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                onclick='openMapModal(${JSON.stringify(trash)})'
+              >Show Map</button>
+              <button
+                class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                onclick="emptyTrash('${trash._id}')"
+              >Empty</button>
+            </td>`;
           list.appendChild(tr);
         });
       }
 
+      async function emptyTrash(id) {
+        if (!confirm("Mark this bin as emptied?")) return;
+        try {
+          const res = await fetch(
+            `https://trash-managment.onrender.com/api/trash/${id}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (!res.ok) throw new Error("Update failed");
+          const updated = await res.json();
+          document.getElementById(`level-${id}`).textContent = updated.level;
+        } catch (err) {
+          console.error(err);
+          alert("Could not empty the bin. Try again.");
+        }
+      }
+
       function openMapModal(trash) {
         document.getElementById("modal-trash-info").innerHTML = `
-        <tr>
-          <td class="px-4 py-2">${trash.trash_id}</td>
-          <td class="px-4 py-2">${trash.level}</td>
-          <td class="px-4 py-2">${trash.latitude}</td>
-          <td class="px-4 py-2">${trash.longitude}</td>
-        </tr>`;
+          <tr>
+            <td class="px-4 py-2">${trash.trash_id}</td>
+            <td class="px-4 py-2">${trash.level}</td>
+            <td class="px-4 py-2">${trash.latitude}</td>
+            <td class="px-4 py-2">${trash.longitude}</td>
+          </tr>`;
         MAPModal.showModal();
-
         setTimeout(() => {
           const mapEl = document.getElementById("map");
           mapEl.innerHTML = "";
@@ -318,16 +271,8 @@
           }
         }, 100);
       }
-      const userNameEl = document.getElementById("user-name");
-      const userEmailEl = document.getElementById("user-email");
 
       async function fetchUserInfo() {
-        if (!token) {
-          alert("You must be logged in.");
-          window.location.href = "/login";
-          return;
-        }
-
         try {
           const res = await fetch(
             "https://trash-managment.onrender.com/api/users/prof",
@@ -338,23 +283,17 @@
               },
             }
           );
-
-          if (!res.ok) throw new Error("Failed to fetch user info");
-
           const data = await res.json();
-
-          // Check if data is an array and get first user if yes
           const user = Array.isArray(data) ? data[0] : data;
-
-          userNameEl.textContent = user?.name || "Unknown User";
-          userEmailEl.textContent = user?.email || "No Email Found";
-        } catch (error) {
-          console.error(error);
-          userNameEl.textContent = "Error loading user";
-          userEmailEl.textContent = "";
+          document.getElementById("user-name").textContent = user.name;
+          document.getElementById("user-email").textContent = user.email;
+        } catch {
+          document.getElementById("user-name").textContent = "Error";
+          document.getElementById("user-email").textContent = "";
         }
       }
 
+      // Initialize
       fetchUserInfo();
       showTrashData();
     </script>

@@ -39,6 +39,10 @@ app.get('/admin/logs', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin', 'logs.html'));
 });
 
+app.get('/admin/trash', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'trash.html'));
+});
+
 // Employee Pages
 app.get('/employee/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'employee', 'dashboard.html'));
@@ -46,6 +50,11 @@ app.get('/employee/dashboard', (req, res) => {
 
 app.get('/employee/report', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'employee', 'report.html'));
+});
+
+//resident
+app.get('/Resident/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'Resident', 'dashboard.html'));
 });
 
 // Connect MongoDB

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ open: false }">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <title>EcoTrack - Trash Management</title>
+    <style>
+      dialog::backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+      dialog[open] {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Mobile Navbar -->
+    <div class="md:hidden flex items-center justify-between bg-gray-100 p-4 border-b border-gray-300">
+      <span class="text-xl font-bold">EcoTrack</span>
+      <button @click="open = !open" class="text-gray-700 focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path x-show="!open" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          <path x-show="open" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+      <!-- Sidebar -->
+      <aside class="hidden md:flex md:flex-col w-64 bg-gray-100 border-r border-gray-300 p-5 justify-between">
+        <nav>
+          <ul class="space-y-4">
+            <li class="text-lg font-bold">EcoTrack</li>
+            <li><a href="/admin/dashboard" class="block px-2 py-1 rounded hover:bg-blue-200">Dashboard</a></li>
+            <li><a href="/admin/reports" class="block px-2 py-1 rounded hover:bg-blue-200">Reports</a></li>
+            <li><a href="/admin/logs" class="block px-2 py-1 rounded hover:bg-blue-200">Logs</a></li>
+            <li><a href="/admin/trash" class="block px-2 py-1 rounded bg-blue-200 hover:bg-blue-200">Manage Trash</a></li>
+          </ul>
+        </nav>
+        <div class="mt-10">
+          <div class="flex items-start space-x-2">
+            <div>
+              <p id="user-name" class="font-medium">Loading...</p>
+              <p id="user-email" class="text-sm text-gray-600">Loading...</p>
+            </div>
+          </div>
+          <button class="mt-4 bg-red-500 text-white px-4 py-2 rounded w-full hover:bg-red-600" onclick="logout()">
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      <!-- Sidebar for Mobile -->
+      <aside x-show="open" @click.outside="open = false" class="fixed z-50 md:hidden top-0 left-0 h-full w-64 bg-gray-100 border-r border-gray-300 p-5 flex flex-col justify-between">
+        <nav>
+          <ul class="space-y-4">
+            <li class="text-lg font-bold">EcoTrack</li>
+            <li><a href="/admin/dashboard" class="block px-2 py-1 rounded hover:bg-blue-200">Dashboard</a></li>
+            <li><a href="/admin/reports" class="block px-2 py-1 rounded hover:bg-blue-200">Reports</a></li>
+            <li><a href="/admin/logs" class="block px-2 py-1 rounded hover:bg-blue-200">Logs</a></li>
+            <li><a href="/admin/trash.html" class="block px-2 py-1 rounded bg-blue-200 hover:bg-blue-200">Manage Trash</a></li>
+          </ul>
+        </nav>
+        <div class="mt-10">
+          <div class="flex items-start space-x-2">
+            <div>
+              <p id="user-name" class="font-medium">Loading...</p>
+              <p id="user-email" class="text-sm text-gray-600">Loading...</p>
+            </div>
+          </div>
+          <button class="mt-4 bg-red-500 text-white px-4 py-2 rounded w-full hover:bg-red-600" onclick="logout()">
+            Logout
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+        <h1 class="text-2xl font-bold mb-6">Post Trash Bin</h1>
+
+        <form id="trashForm" class="max-w-lg space-y-4 bg-white p-6 rounded shadow">
+          <div>
+            <label for="trash_id" class="block font-medium">Trash ID</label>
+            <input type="text" id="trash_id" name="trash_id" class="w-full border p-2 rounded" required />
+          </div>
+
+          <div>
+            <label for="level" class="block font-medium">Level (%)</label>
+            <input type="number" id="level" name="level" class="w-full border p-2 rounded" required />
+          </div>
+
+          <div>
+            <label for="latitude" class="block font-medium">Latitude</label>
+            <input type="text" id="latitude" name="latitude" class="w-full border p-2 rounded" required />
+          </div>
+
+          <div>
+            <label for="longitude" class="block font-medium">Longitude</label>
+            <input type="text" id="longitude" name="longitude" class="w-full border p-2 rounded" required />
+          </div>
+
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Submit Trash
+          </button>
+        </form>
+      </main>
+    </div>
+
+    <script>
+      const token = localStorage.getItem("token");
+      const userNameEl = document.getElementById("user-name");
+      const userEmailEl = document.getElementById("user-email");
+
+      if (!token) {
+        alert("You are not logged in");
+        window.location.href = "/login";
+      }
+
+      async function fetchUserInfo() {
+        try {
+          const res = await fetch("https://trash-managment.onrender.com/api/users/prof", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          const data = await res.json();
+          console.log(data);
+          const user = Array.isArray(data) ? data[0] : data;
+
+          userNameEl.textContent = user?.name || "Unknown";
+          userEmailEl.textContent = user?.email || "No email";
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+      }
+
+      fetchUserInfo();
+
+      const trashForm = document.getElementById("trashForm");
+
+      trashForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(trashForm));
+
+        try {
+          const res = await fetch("http://localhost:5000/api/trash", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(data),
+          });
+
+          const result = await res.json();
+
+          if (!res.ok) {
+            alert(result.message || "Failed to submit");
+            return;
+          }
+
+          alert("Trash info submitted!");
+          trashForm.reset();
+        } catch (error) {
+          console.error(error);
+          alert("Error submitting trash info");
+        }
+      });
+    </script>
+  </body>
+</html>

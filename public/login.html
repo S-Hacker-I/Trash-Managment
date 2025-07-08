@@ -63,6 +63,8 @@
           window.location.href = '/admin/dashboard';
         } else if (data.user.role === 'employee') {
           window.location.href = '/employee/dashboard';
+        } else if (data.user.role === 'resident') {
+          window.location.href = '/Resident/dashboard';
         } else {
           alert('Unknown user role!');
         }

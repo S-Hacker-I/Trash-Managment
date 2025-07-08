@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <title>Resident - Trash Levels</title>
+  </head>
+  <body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow p-4 flex justify-between items-center">
+      <div>
+        <h1 class="text-xl font-semibold" id="welcome-user">Welcome, Resident</h1>
+      </div>
+      <button onclick="logout()" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+        Logout
+      </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-4 md:p-8">
+      <h2 class="text-2xl font-bold mb-6">Trash Levels</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-300 text-left">
+          <thead>
+            <tr>
+              <th class="border-b-2 border-gray-300 px-4 py-2">Trash ID</th>
+              <th class="border-b-2 border-gray-300 px-4 py-2">Current Level</th>
+              <th class="border-b-2 border-gray-300 px-4 py-2">Location</th>
+              <th class="border-b-2 border-gray-300 px-4 py-2">Choose New Level</th>
+            </tr>
+          </thead>
+          <tbody id="trash-list">
+            <!-- Trash data injected here -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <script>
+      const trashList = document.getElementById('trash-list');
+      const token = localStorage.getItem('token');
+
+      async function fetchTrash() {
+        try {
+          const res = await fetch('https://trash-managment.onrender.com/api/trashs');
+          const data = await res.json();
+          renderTrash(data);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      function renderTrash(data) {
+        trashList.innerHTML = '';
+        data.forEach(trash => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="px-4 py-2">${trash.trash_id}</td>
+            <td class="px-4 py-2">${trash.level}%</td>
+            <td class="px-4 py-2">Lat: ${trash.latitude}, Lng: ${trash.longitude}</td>
+            <td class="px-4 py-2">
+              <select class="border p-1 rounded mr-2" id="level-${trash._id}">
+                <option value="" disabled selected>Choose level</option>
+                <option value="0">0%</option>
+                <option value="25">25%</option>
+                <option value="50">50%</option>
+                <option value="75">75%</option>
+                <option value="100">100%</option>
+              </select>
+              <button onclick="updateLevel('${trash.trash_id}', '${trash.latitude}', '${trash.longitude}', '${trash._id}')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Update</button>
+            </td>
+          `;
+          trashList.appendChild(row);
+        });
+      }
+
+      async function updateLevel(trashId, latitude, longitude, elementId) {
+        const level = document.getElementById(`level-${elementId}`).value;
+        if (!level) return alert("Please select a level before updating.");
+
+        try {
+          const res = await fetch('https://trash-managment.onrender.com/api/trash', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ trash_id: trashId, level, latitude, longitude }),
+          });
+          if (!res.ok) throw new Error('Failed');
+          alert('Trash level updated!');
+          fetchTrash();
+        } catch (err) {
+          alert('Error updating trash level');
+          console.error(err);
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      }
+
+      async function fetchUserInfo() {
+        try {
+          const res = await fetch("https://trash-managment.onrender.com/api/users/prof", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          const data = await res.json();
+          const user = Array.isArray(data) ? data[0] : data;
+          document.getElementById("welcome-user").textContent = `Welcome, ${user?.name || 'Resident'}`;
+        } catch (error) {
+          console.error("Failed to load user info");
+        }
+      }
+
+      fetchUserInfo();
+      fetchTrash();
+    </script>
+  </body>
+</html>
