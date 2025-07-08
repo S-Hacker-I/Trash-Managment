@@ -40,7 +40,7 @@ app.get('/admin/logs', (req, res) => {
 });
 
 app.get('/admin/trash', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin', 'trash.html'));
+  res.sendFile(path.join(__dirname, 'public', 'admin', 'Trash.html'));
 });
 
 // Employee Pages
