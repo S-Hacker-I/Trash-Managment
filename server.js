@@ -53,7 +53,7 @@ app.get('/employee/report', (req, res) => {
 });
 
 //resident
-app.get('/Resident/dashboard', (req, res) => {
+app.get('/admin/trash', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'Resident', 'dashboard.html'));
 });
 
