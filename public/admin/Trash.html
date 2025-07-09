@@ -155,7 +155,7 @@
         const data = Object.fromEntries(new FormData(trashForm));
 
         try {
-          const res = await fetch("http://localhost:5000/api/trash", {
+          const res = await fetch("https://trash-managment.onrender.com/api/trash", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
